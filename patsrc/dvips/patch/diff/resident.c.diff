@@ -1,0 +1,306 @@
+*** resident.c.orig	Tue Nov 10 00:51:36 1998
+--- resident.c	Thu Nov 19 04:35:40 1998
+***************
+*** 11,14 ****
+--- 11,34 ----
+  #include "dvips.h" /* The copyright notice in that file is included too! */
+  #include "paths.h"
++ 
++ 
++ /*	Include definitions from emtexdir.h if EMTEXDIR is set.
++  *	setting up the emtex-dir structures for all pathes.
++  *	sawade@physik.tu-berlin.de	25-sep-95
++  */
++ #ifdef EMTEXDIR
++ #include "emtexdir.h"
++ 
++ extern FILE * emtex_dir_search() ;
++ 
++ struct emtex_dir	ed_vfpath,
++ 			ed_pictpath,
++ 			ed_tfmpath,
++ 			ed_figpath,
++ 			ed_flipath,
++ 			ed_headerpath,
++ 			ed_configpath;
++ #endif
++ 
+  /*
+   *   This is the structure definition for resident fonts.  We use
+***************
+*** 303,306 ****
+--- 323,327 ----
+  char *who, *what ;
+  {
++    char varname[80], *v;
+     if (who) {
+        register char *pp, *qq ;
+***************
+*** 308,311 ****
+--- 329,354 ----
+  
+        for (pp=nextstring, qq=who; *qq;) {
++ /*********	    Additions for variable $(var) expanding into <var>	*/
++ /*********	    sawade@physik.tu-berlin.de		3/95		*/
++ 	 if ( *qq == '$') {
++ 	    if (*++qq == '(') {
++ 	       v = varname;
++ 	       while( *++qq ) {
++ 		  if( (*v++ = *qq) == ')' ) {
++ 		     *(v-1) = '\0';
++ 		     qq++;
++ 		     if ( getenv(varname) ) {
++ 			strcpy(pp, getenv(varname));
++ 			pp = pp + strlen(pp);
++ 			lastsep = 0;
++ 		     }
++ 		     break;
++ 		  }
++ 	       }
++ 	    } else {
++ 	       qq--; /* no '(' follows '$', ignore  */
++ 	    }
++ 	 }
++ /*********	    end of additions for variable expansion		*/
+  	 if (*qq == PATHSEP) {
+  	    if (lastsep) {
+***************
+*** 358,361 ****
+--- 401,424 ----
+     return newstring(tstr) ;
+  }
++ 
++ #ifdef EMTEXDIR
++ /*   Now the setting up routine to fetch the list of directories.
++  *   This is only an adaption of the original emtex_dir_setup
++  *   function from emtexdir.c by E. Mattes.
++  *   sawade@physik.tu-berlin.de 	25-sep-95
++  */
++ int ed_path_setup (struct emtex_dir *ed, const char *path,
++ 		   const char *dir, unsigned flags)
++ {
++   extern int setup_list() ;
++   char dummy[260] ;
++ 
++   ed->alloc = 0;
++   ed->used = 0;
++   ed->list = NULL;
++   return( setup_list (ed, dummy, path, flags) );
++ }
++ #endif
++ 
+  /*
+   *   Now we have the getdefaults routine.
+***************
+*** 394,398 ****
+  #endif
+     }
+!    if ((deffile=search(d,PSname,READ))!=NULL) {
+        while (fgets(was_inline, INLINE_SIZE, deffile)!=NULL) {
+  /*
+--- 457,467 ----
+  #endif
+     }
+! #ifdef EMTEXDIR
+! /*  using emtex_dir_search instead of search.	    sawade 25-sep-95 */
+!    if ((deffile=emtex_dir_search(&ed_configpath,PSname,READ))!=NULL)
+! #else
+!    if ((deffile=search(d,PSname,READ))!=NULL)
+! #endif
+!    {
+        while (fgets(was_inline, INLINE_SIZE, deffile)!=NULL) {
+  /*
+***************
+*** 491,495 ****
+                 sendcontrolD = 1 ; /* if we send to a device, *we* are spooler */
+  #if defined(MSDOS) || defined(OS2)
+!                oname[strlen(oname)-1] = 0 ;
+  #endif
+              }
+--- 560,564 ----
+  	       sendcontrolD = 1 ; /* if we send to a device, *we* are spooler */
+  #if defined(MSDOS) || defined(OS2)
+! 	       oname[strlen(oname)-1] = 0;     /* strip ':' off */
+  #endif
+  	    }
+***************
+*** 511,514 ****
+--- 580,593 ----
+  	    else {
+  	       flipath = getpath(fliparse(PSname,tempname), flipath);
++ /*
++  *	Yes, we use emtex_dir routines also for flipath :)
++  *	sawade@physik.tu-berlin.de	25-sep-95
++  */
++ #ifdef EMTEXDIR
++ 	       if( !ed_path_setup (&ed_flipath, flipath, NULL, EDS_BANG ) ) {
++ 		  printf("\n** ed_path_setup for FLIPATH failed. Abort.\n");
++ 		  exit(1);
++ 	       }
++ #endif
+  	       fliname = newstring(tempname) ;
+  	    }
+***************
+*** 727,731 ****
+     if (name == 0)
+        name = psmapfile ;
+!    if ((deffile=search(configpath, name, READ))!=NULL) {
+        while (fgets(was_inline, INLINE_SIZE, deffile)!=NULL) {
+           p = was_inline ;
+--- 806,816 ----
+     if (name == 0)
+        name = psmapfile ;
+! #ifdef EMTEXDIR
+! /*  using emtex_dir_search instead of search.	    sawade 25-sep-95 */
+!     if ((deffile=emtex_dir_search(&ed_configpath,name,READ))!=NULL)
+! #else
+!     if ((deffile=search(configpath, name, READ))!=NULL)
+! #endif
+!     {
+        while (fgets(was_inline, INLINE_SIZE, deffile)!=NULL) {
+  	 p = was_inline ;
+***************
+*** 841,844 ****
+--- 926,936 ----
+     return getpath(getenv(who), what) ;
+  }
++ 
++ /*
++  * Here is a lot of code added for setting up the lists of directories.
++  * sawade@physik.tu-berlin.de		25-sep-95
++  * bug fixed: Wonkoo Kim (wkim+@pitt.edu), November 1, 1998
++  */
++ 
+  #ifdef SEARCH_SUBDIRECTORIES
+  static char *concat3();
+***************
+*** 849,856 ****
+--- 941,1008 ----
+     if (which) {
+        tfmpath = getenvup(FONTPATH, tfmpath) ;
++ #ifdef DEBUG
++      if( dd(D_PATHS) )
++ 	if( getenv(FONTPATH) )
++ 	   (void) fprintf(stderr, "\n!! tfmpath replaced by %s.\n", FONTPATH);
++ #endif
++ #ifdef EMTEXDIR
++      if( !ed_path_setup (&ed_tfmpath, tfmpath, NULL, EDS_BANG ) ) {
++ 	printf("\n** ed_path_setup for tfmpath failed. Abort.\n");
++ 	exit(1);
++      }
++ #endif
++ 
+        vfpath = getenvup("VFFONTS", vfpath) ;
++ #ifdef DEBUG
++      if( dd(D_PATHS) )
++ 	if( getenv("VFFONTS") )
++ 	   (void) fprintf(stderr, "\n!! vfpath replaced by VFFONTS.\n");
++ #endif
++ #ifdef EMTEXDIR
++      if( !ed_path_setup (&ed_vfpath, vfpath, NULL, EDS_BANG ) ) {
++ 	printf("\n** ed_path_setup for vfpath failed. Abort.\n");
++ 	exit(1);
++      }
++ #endif
++ 
+        pictpath = getenvup("TEXPICTS", pictpath) ;
++ #ifdef DEBUG
++      if( dd(D_PATHS) )
++ 	if( getenv("TEXPICTS") )
++ 	   (void) fprintf(stderr, "\n!! pictpath replaced by TEXPICTS.\n");
++ #endif
++ #ifdef EMTEXDIR
++      if( !ed_path_setup (&ed_pictpath, pictpath, NULL, EDS_BANG ) ) {
++ 	printf("\n** ed_path_setup for pictpath failed. Abort.\n");
++ 	exit(1);
++      }
++ #endif
++ 
+        figpath = getenvup("TEXINPUTS", figpath) ;
++ #ifdef DEBUG
++      if( dd(D_PATHS) )
++ 	if( getenv("TEXINPUTS") )
++ 	   (void) fprintf(stderr, "\n!! figpath replaced by TEXINPUTS.\n");
++ #endif
++ #ifdef EMTEXDIR
++      if( !ed_path_setup (&ed_figpath, figpath, NULL, EDS_BANG ) ) {
++ 	printf("\n** ed_path_setup for figpath failed. Abort.\n");
++ 	exit(1);
++      }
++ #endif
++ 
+        headerpath = getenvup("DVIPSHEADERS", headerpath) ;
++ #ifdef DEBUG
++      if( dd(D_PATHS) )
++ 	if( getenv("DVIPSHEADERS") )
++ 	   (void) fprintf(stderr, "\n!! headerpath replaced by DVIPSHEADERS.\n");
++ #endif
++ #ifdef EMTEXDIR
++      if( !ed_path_setup (&ed_headerpath, headerpath, NULL, EDS_BANG ) ) {
++ 	printf("\n** ed_path_setup for headerpath failed. Abort.\n");
++ 	exit(1);
++      }
++ #endif
++ 
+        if (getenv("TEXPKS"))
+  	 pkpath = getenvup("TEXPKS", pkpath) ;
+***************
+*** 862,865 ****
+--- 1014,1033 ----
+        else if (getenv(FONTPATH))
+  	 pkpath = getenvup(FONTPATH, pkpath) ;
++ #endif SEARCH_SUBDIRECTORIES
++ #ifdef DEBUG
++      if( dd(D_PATHS) )
++ 	if( getenv("TEXPKS") )
++ 	   (void) fprintf(stderr, "\n!! pkpath replaced by TEXPKS.\n");
++ 	else if( getenv("TEXPACKED") )
++ 	   (void) fprintf(stderr, "\n!! pkpath replaced by TEXPACKED.\n");
++ 	else if( getenv("PKFONTS") )
++ 	   (void) fprintf(stderr, "\n!pkpath replaced by PKFONTS.\n");
++ #ifdef SEARCH_SUBDIRECTORIES
++ 	else if (getenv(FONTPATH))
++ 	   (void) fprintf(stderr, "\n!pkpath replaced by %s.\n", FONTPATH);
++ #endif
++ #endif
++ 
++ #ifdef SEARCH_SUBDIRECTORIES
+        if (getenv ("TEXFONTS_SUBDIR"))
+  	 fontsubdirpath = getenvup ("TEXFONTS_SUBDIR", fontsubdirpath);
+***************
+*** 877,881 ****
+--- 1045,1078 ----
+  #endif
+     } else
++ /*
++  *	The following makes emTeX/dvips setup more comfortable,
++  *	because TEXCONFIG defaults to $(EMTEXDIR)\data\dvips.
++  *	sawade@physik.tu-berlin.de	25-sep-95
++  */
++ #ifdef EMTEX
++    {
++ #ifdef DEBUG
++      if( dd(D_PATHS) )
++ 	if( getenv("TEXCONFIG") )
++ 	   (void) fprintf(stderr, "\n!! configpath replaced by TEXCONFIG.\n");
++ #endif
++      if( getenv("TEXCONFIG") == NULL ) {
++ 	if( getenv("EMTEXDIR") == NULL )
++ 	   configpath = getpath("\\emtex\\data\\dvips", configpath) ;
++ 	else
++ 	   configpath = getpath("$(EMTEXDIR)\\data\\dvips", configpath) ;
++      } else
++ 	configpath = getenvup("TEXCONFIG", configpath) ;
++ 
++ #ifdef EMTEXDIR
++      if( !ed_path_setup (&ed_configpath, configpath, NULL, EDS_BANG ) ) {
++ 	printf("\n** ed_path_setup for configpath failed. Abort.\n");
++ 	exit(1);
++      }
++ #endif
++    }
++ #else
+        configpath = getenvup("TEXCONFIG", configpath) ;
++ #endif
+  }
+  

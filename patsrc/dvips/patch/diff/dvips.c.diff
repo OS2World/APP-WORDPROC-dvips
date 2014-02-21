@@ -1,0 +1,134 @@
+*** dvips.c.orig	Tue Nov  3 12:58:36 1998
+--- dvips.c	Thu Nov 19 04:30:32 1998
+***************
+*** 11,14 ****
+--- 11,27 ----
+  extern char *strtok() ; /* some systems don't have this in strings.h */
+  #endif
++ 
++ #ifdef EMTEXDIR
++ /*    sawade@physik.tu-berlin.de      26-sep-95       */
++ #include "emtexdir.h"
++ extern struct emtex_dir ed_vfpath,
++ 		      ed_pictpath,
++ 		      ed_tfmpath,
++ 		      ed_figpath,
++ 		      ed_flipath,
++ 		      ed_headerpath,
++ 		      ed_configpath;
++ #endif
++ 
+  #ifdef VMS
+  #define GLOBAL globaldef
+***************
+*** 261,264 ****
+--- 274,280 ----
+  "t s Paper format                   Y # Vertical resolution",
+  "x # Override dvi magnification     Z*  Compress bitmap fonts",
++ #ifdef HPS
++ "z   Hyperdvi to HyperPostScript",
++ #endif
+  /* "-   Interactive query of options", */
+  "    # = number   f = file   s = string  * = suffix, `0' to turn off",
+***************
+*** 467,470 ****
+--- 483,508 ----
+     register sectiontype *sects ;
+  
++ #ifdef SAWVER
++ /*
++  *    When DVIPS_STDERR is set, this is the file, where
++  *    all messages go. (this is for the DOS community. they
++  *    cannot redirect stderr).
++  *    and a version information about the port follows.
++  *    sawade@physik.tu-berlin.de      29.sept.95
++  */
++    char *dvips_messages;
++    extern char *getenv() ;
++    if ( (dvips_messages = getenv("DVIPS_STDERR")) )
++       if (! freopen(dvips_messages, "w", stderr) ) {
++        printf("** Cannot redirect stderr to '%s'\n STOP!. **\n", dvips_messages);
++        exit( 99 );
++       }
++ #if 0
++ /********************************/
++    fprintf(stderr, "%s\n", SAWVER);   /* sawade 10/94 */
++ /********************************/
++ #endif
++ #endif
++ 
+  #ifdef __THINK__
+     argc = dcommand(&argv) ; /* do I/O stream redirection */
+***************
+*** 682,690 ****
+  #if defined(MSDOS) || defined(OS2) || defined(ATARIST)
+                 /* check for emTeX job file (-pj=filename) */
+!                if (*p == 'j') {
+                   p++;
+                   if (*p == '=' || *p == ':')
+                     p++;
+                   mfjobname = newstring(p);
+                   break;
+                 }
+--- 720,733 ----
+  #if defined(MSDOS) || defined(OS2) || defined(ATARIST)
+  	       /* check for emTeX job file (-pj=filename) */
+! 	       /* hacked for new emTeX dvidrv 1.5.. (-pv:filename) sawade 8/94 */
+! 	       if (*p == 'j' || *p == 'v') {
+  		 p++;
+  		 if (*p == '=' || *p == ':')
+  		   p++;
++ 		 if(*p) /* This is due to OS/2's interpretation of '='... sawade 3/95 */
+  		 mfjobname = newstring(p);
++ 		 else
++ 		    /* "xx=yy" becomes "xx yy" after passing to a batch file -- Wonkoo Kim (wkim+@pitt.edu) */
++ 		    mfjobname = newstring(p=argv[++i]);
+  		 break;
+  	       }
+***************
+*** 1022,1031 ****
+  #endif /* ~SHORTINT */
+             iname, oname, swmem) ;
+     (void)fprintf(stderr,"tfm path %s\npk path %s\n", tfmpath, pkpath) ;
+     (void)fprintf(stderr,"fig path %s\nvf path %s\n", figpath, vfpath) ;
+     (void)fprintf(stderr,"config path %s\nheader path %s\n",
+                    configpath, headerpath) ;
+  #ifdef FONTLIB
+!    (void)fprintf(stderr,"fli path %s\nfli names %s\n", flipath, fliname) ;
+  #endif
+     } /* dd(D_PATHS) */
+--- 1065,1098 ----
+  #endif /* ~SHORTINT */
+  	   iname, oname, swmem) ;
++ #ifdef EMTEXDIR
++    (void)fprintf(stderr,"\npk path %s\n", pkpath) ;
++    (void)fprintf(stderr,"\ntfm path %s\n- directories:\n", tfmpath) ;
++      for (i = 0; i < ed_tfmpath.used; ++i)
++ 	 fprintf (stderr,"   %s\n", ed_tfmpath.list[i]);
++    (void)fprintf(stderr,"\nfig path %s\n- directories:\n", figpath) ;
++      for (i = 0; i < ed_figpath.used; ++i)
++ 	 fprintf (stderr,"   %s\n", ed_figpath.list[i]);
++    (void)fprintf(stderr,"\nvf path %s\n- directories:\n", vfpath) ;
++      for (i = 0; i < ed_vfpath.used; ++i)
++ 	 fprintf (stderr,"   %s\n", ed_vfpath.list[i]);
++    (void)fprintf(stderr,"\nconfig path %s\n- directories:\n", configpath) ;
++      for (i = 0; i < ed_configpath.used; ++i)
++ 	 fprintf (stderr,"   %s\n", ed_configpath.list[i]);
++    (void)fprintf(stderr,"\nheader path %s\n- directories:\n", headerpath) ;
++      for (i = 0; i < ed_headerpath.used; ++i)
++ 	 fprintf (stderr,"   %s\n", ed_headerpath.list[i]);
++ #else
+     (void)fprintf(stderr,"tfm path %s\npk path %s\n", tfmpath, pkpath) ;
+     (void)fprintf(stderr,"fig path %s\nvf path %s\n", figpath, vfpath) ;
+     (void)fprintf(stderr,"config path %s\nheader path %s\n",
+  		  configpath, headerpath) ;
++ #endif
+  #ifdef FONTLIB
+!    (void)fprintf(stderr,"\nfli path %s\nfli names %s\n", flipath, fliname) ;
+! #ifdef EMTEXDIR
+!    (void)fprintf(stderr,"- directories:\n") ;
+!      for (i = 0; i < ed_flipath.used; ++i)
+! 	 fprintf (stderr,"   %s\n", ed_flipath.list[i]);
+! #endif
+  #endif
+     } /* dd(D_PATHS) */

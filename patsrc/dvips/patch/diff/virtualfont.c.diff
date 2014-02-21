@@ -1,0 +1,30 @@
+*** virtualfont.c.orig	Tue Nov  3 12:58:38 1998
+--- virtualfont.c	Thu Nov 19 04:30:38 1998
+***************
+*** 4,7 ****
+--- 4,15 ----
+   */
+  #include "dvips.h" /* The copyright notice in that file is included too! */
++ 
++ #ifdef EMTEXDIR
++ /*	sawade@physik.tu-berlin.de	25-sep-95	*/
++ #include "emtexdir.h"
++ extern struct emtex_dir ed_vfpath ;
++ extern FILE * emtex_dir_search() ;
++ #endif
++ 
+  /*
+   *   These are the external routines we use.
+***************
+*** 95,99 ****
+--- 103,112 ----
+     (void)sprintf(name, "%s.vf", n) ;
+  #endif
++ #ifdef EMTEXDIR
++ /*  using emtex_dir_search instead of search.	    sawade 25-sep-95 */
++    if (0 != (vffile=emtex_dir_search(&ed_vfpath, name, READBIN)))
++ #else
+     if (0 != (vffile=search(d, name, READBIN)))
++ #endif
+        return(1) ;
+     return(0) ;

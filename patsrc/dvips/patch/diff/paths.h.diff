@@ -1,0 +1,22 @@
+*** paths.h.orig	Tue Nov  3 12:58:38 1998
+--- paths.h	Thu Nov 19 04:30:36 1998
+***************
+*** 75,78 ****
+--- 75,91 ----
+  #endif
+  #endif
++ #endif
++ #endif
++ 
++ #if defined(MSDOS) || defined(OS2)
++ /* EPS files (%%BeginBinary section) must be opened in binary mode  */
++ /* -- Wonkoo Kim (wkim+@pitt.edu), December 5, 1997		    */
++ #define WRITEBIN "wb"
++ #else
++ #ifdef VMCMS
++ #define WRITEBIN "wb, lrecl=1024, recfm=f"
++ #else
++ /* other systems ?? */
++ #define WRITEBIN "w"
+  #endif
+  #endif

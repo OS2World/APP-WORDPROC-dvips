@@ -1,0 +1,55 @@
+*** flib.c.orig	Tue Nov  3 12:58:38 1998
+--- flib.c	Thu Nov 19 04:30:34 1998
+***************
+*** 7,10 ****
+--- 7,18 ----
+  #include "dvips.h"
+  #include "paths.h"
++ 
++ #ifdef EMTEXDIR
++ /*	sawade@physik.tu-berlin.de	26-sep-95	*/
++ #include "emtexdir.h"
++ extern struct emtex_dir ed_flipath ;
++ extern FILE * emtex_dir_search() ;
++ #endif
++ 
+  extern FILE *search() ;
+  extern char *newstring() ;
+***************
+*** 104,108 ****
+              strcat(name,".fli");
+  
+!          if ( (pkfile=search(flipath,name,READBIN)) != (FILE *)NULL ) {
+              /* for each font library */
+              for (i=0; i<4; i++) {
+--- 112,122 ----
+  	    strcat(name,".fli");
+  
+! #ifdef EMTEXDIR
+! /*  using emtex_dir_search instead of search.	    sawade 26-sep-95 */
+! 	 if ( (pkfile=emtex_dir_search(&ed_flipath,name,READBIN)) != (FILE *)NULL )
+! #else
+! 	 if ( (pkfile=search(flipath,name,READBIN)) != (FILE *)NULL )
+! #endif
+! 	 {
+  	    /* for each font library */
+  	    for (i=0; i<4; i++) {
+***************
+*** 251,255 ****
+                               fli_cache[i] = fli_cache[i-1];
+                          /* put this font library at front */
+!                         if ( (pkfile=search(flipath,lib->name,READBIN)) == (FILE *)NULL ) {
+                             sprintf(errbuf,"Can't reopen font library %s", lib->name);
+                             error(errbuf);
+--- 265,275 ----
+  			     fli_cache[i] = fli_cache[i-1];
+  			/* put this font library at front */
+! #ifdef EMTEXDIR
+! /*  using emtex_dir_search instead of search.	    sawade 26-sep-95 */
+! 			if ( (pkfile=emtex_dir_search(&ed_flipath,lib->name,READBIN)) == (FILE *)NULL )
+! #else
+! 			if ( (pkfile=search(flipath,lib->name,READBIN)) == (FILE *)NULL )
+! #endif
+! 			{
+  			   sprintf(errbuf,"Can't reopen font library %s", lib->name);
+  			   error(errbuf);

@@ -1,0 +1,68 @@
+*** dospecial.c.orig	Tue Nov  3 12:58:36 1998
+--- dospecial.c	Thu Nov 19 04:30:32 1998
+***************
+*** 5,8 ****
+--- 5,16 ----
+  #include "dvips.h" /* The copyright notice in that file is included too! */
+  
++ #ifdef EMTEXDIR
++ /*	sawade@physik.tu-berlin.de	25-sep-95	*/
++ #include "emtexdir.h"
++ extern struct emtex_dir ed_pictpath;
++ extern struct emtex_dir ed_figpath;
++ extern FILE * emtex_dir_search();
++ #endif
++ 
+  #include <ctype.h>
+  #include <stdlib.h>
+***************
+*** 459,463 ****
+--- 467,477 ----
+  char *s ;
+  {
++ #ifdef EMTEXDIR
++ /*  using emtex_dir_search instead of search.	    sawade 25-sep-95 */
++    FILE *f = emtex_dir_search(&ed_figpath, s, "r");
++ 			/* Wonkoo Kim (wkim+@pitt.edu), April 25, 1997 */
++ #else
+     FILE *f = search(figpath, s, "r") ;
++ #endif
+     if (f)
+        close_file(f) ;
+***************
+*** 668,671 ****
+--- 682,688 ----
+     if (strncmp(p, "sh ", 3) == 0) {shadeLast(p+3); return;} /* tpic 2.0 */
+  #endif
++ #ifdef DVIWIN
++    if (strncmp(p, "src:", 4) == 0) return;  /* ignore DVIWIN inverse search specials */
++ #endif
+     break ;
+  case 'a':
+***************
+*** 737,740 ****
+--- 754,758 ----
+  
+     cmdout("@setspecial");
++    cmdout("") ;/*    saw 28.6.95 */
+  
+     if(psfile[0]) {
+***************
+*** 759,763 ****
+     char cmd[400] ;
+     FILE *f ;
+!    if (0 != (f=search(pictpath, iname, "r"))) {
+        close_file(f) ;
+     } else {
+--- 777,787 ----
+     char cmd[400] ;
+     FILE *f ;
+! #ifdef EMTEXDIR
+! /*  using emtex_dir_search instead of search.	    sawade 25-sep-95 */
+!    if (0 != (f=emtex_dir_search(&ed_pictpath, iname, "r")))
+! #else
+!    if (0 != (f=search(pictpath, iname, "r")))
+! #endif
+!    {
+        close_file(f) ;
+     } else {

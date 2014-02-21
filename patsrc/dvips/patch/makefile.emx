@@ -1,0 +1,359 @@
+#
+#   Makefile for dvips.  Edit this first part of the file.
+#
+#   First, the things that absolutely must be edited for your system.
+
+# modified for EMX-0.8g/GCC with NMAKE on OS/2 2.1.
+# by rjl@monu1.cc.monash.edu.au
+# 17th February 1994
+
+# modified for emx/gcc 0.9c + GNU make + OS/2 Warp
+# Wonkoo Kim (wkim+@pitt.edu), July 2, 1997
+# last modified on November 19, 1998
+
+DVIPSVER = dvips583
+
+# compiler
+CC = gcc
+
+# All DIRs must use a single \ as a directory separator.
+# All PATHs must use \\ as a directory separator
+#DRIVE = c:
+#TEXDIR = $(DRIVE)\emtex
+TEXDIR = emtex
+TEXPATH = $(DRIVE)\\emtex
+
+# the default path to search for TFM files
+# (this usually is identical to TeX's defaultfontpath, which omits `.')
+# (private fonts are given an explicit directory, which overrides the path)
+# TFMPATH = $(TEXPATH)\\tfm
+TFMPATH = $(TEXPATH)\\tfm!
+TFMPARENTDIR = $(TEXDIR)\tfm
+TFMDIR = $(TEXDIR)\tfm\dvips
+
+# the default path to search for PK files (usually omits `.')
+# Don't forget to add the directory that
+# MakeTeXPK puts the files!  (In this case, /LocalLibrary/Fonts...)
+# PKPATH = $(DRIVE)\\texfonts\\pixel.lj\\%ddpi\\%f.%p
+PKPATH = $(DRIVE)\\texfonts\\pixel.lj\\%%ddpi\\%%f.%%p
+
+# the default path to search for VF files (usually omits `.')
+# VFPATH = $(DRIVE)\\texfonts\\vf
+VFPATH = $(DRIVE)\\texfonts\\vf!
+VFDIR = texfonts\vf
+VFPARENTDIR = texfonts
+
+# additional directories in which to search for subdirectories to find
+# both tfm and pk files
+FONTSUBDIRPATH =
+
+# where the config files go
+# CONFIGDIR = $(TEXDIR)\ps
+CONFIGPARENTDIR = $(TEXDIR)\data
+CONFIGDIR = $(TEXDIR)\data\dvips
+
+# the default path to search for config files
+# CONFIGPATH = .;$(TEXPATH)\\ps
+CONFIGPATH = $(TEXPATH)\\data\\dvips
+
+# the name of your config file
+# CONFIGFILE = config.ps
+CONFIGFILE = config.ps
+
+# where the header PS files go
+# HEADERDIR = $(TEXDIR)\ps
+HEADERDIR = $(TEXDIR)\data\dvips
+
+# the default path to search for header files
+# HEADERPATH = .;$(TEXPATH)\\ps
+HEADERPATH = $(TEXPATH)\\data\\dvips
+
+# where epsf.tex and rotate.tex go (usually the TeX macros directory)
+# TEXMACRODIR = $(TEXDIR)\texinput
+TEXMACROPARENTDIR = $(TEXDIR)\texinput
+TEXMACRODIR = $(TEXDIR)\texinput\dvips
+
+# the default path to search for epsf and psfiles
+# (usually the same as TeX's defaultinputpath)
+# FIGPATH = .;..;$(TEXPATH)\\texinput
+FIGPATH = $(HEADERPATH);$(TEXPATH)\\texinput!
+
+# the default path to search for emTeX font libraries
+# FLIPATH = $(DRIVE)\\texfonts
+FLIPATH = $(DRIVE)\\texfonts
+
+# the names of emTeX font libraries
+# FLINAME = lj_0;lj_h;lj_1;lj_2;lj_3;lj_4;lj_5a;lj_5b;lj_sli
+FLINAME = lj_base;lj_more
+
+# change -DDEFRES=300 or whatever is required
+#    if the default resolution is not 300 dpi,
+# add -DDEBUG to turn on debugging capability
+# add -DTPIC for tpic support
+# add -DFONTLIB to search font libraries
+# add -DSEARCH_SUBDIRECTORIES to search the FONTSUBDIRPATH.
+# add -DHAVE_GETCWD if you have getcwd (relevant only for subdir searching)
+# add -DCREATIONDATE if your system has a working time() and you want dated files
+#   If you define FONTLIB, make sure to also give definitions to
+#   FLIPATH and FLINAME.
+#
+# add -DHPS to add -z option for Hyperdvi to HyperPostScript
+# add -DDVIWIN to ignore DVIWIN inverse search specials
+#
+# For HPS (HyperPostScript), uncomment next two lines;
+# (Or, invoke "make -f makefile.emx allhps" instead of uncommenting.)
+# DHPS = -DHPS
+# HPS  = h
+DEFS = -DTPIC -DDEBUG -DFONTLIB -DDEFRES=300 $(DHPS) -DDVIWIN
+
+OPT = -Wall -O2 -m486
+
+# Link with -lmalloc1 for RSX -RO
+# -- malloc problem (SIGSEGV) is now fixed in emx/gcc 0.9c fix03.
+# LINKOPT = -s -lm -lmalloc1
+LINKOPT = -s -lm
+
+# If you are compiling dvips for suid or other privileges, you will
+# definitely want to define the following symbol; else don't.
+# SECURE = -DSECURE
+SECURE =
+
+# If you want EMTEX specials, define the following.
+# EMTEX = -DEMTEX
+EMTEX = -DEMTEX -DEMTEXDIR
+
+
+# define the c-compiler flag
+# -DOS2 for OS/2 and MS-DOS with EMX extender
+SYS = -DOS2
+
+# where the installed binary goes
+# BINDIR = c:\emtex
+BINDIR = $(TEXDIR)\bin
+
+# where the manual page goes
+# MANDIR = c:\emtex\doc
+MANPARENTDIR = $(TEXDIR)\doc
+MANDIR = $(TEXDIR)\doc\dvips
+
+#makefile.emx sets all paths in paths.rsp
+CFLAGS = $(OPT) $(SYS) $(SECURE) $(EMTEX) $(DEFS)
+
+SRC =	dospecial.c dviinput.c fontdef.c loadfont.c dvips.c tfmload.c \
+	download.c prescan.c scanpage.c skippage.c output.c scalewidth.c \
+	dosection.c dopage.c resident.c search.c unpack.c drawPS.c \
+	header.c makefont.c repack.c virtualfont.c dpicheck.c finclude.c \
+	pprescan.c papersiz.c flib.c color.c bbox.c emspecial.c t1part.c \
+	hps.c emtexdir.c emdir.c
+
+OBJ =	dospecial.o dviinput.o fontdef.o loadfont.o dvips.o tfmload.o \
+	download.o prescan.o scanpage.o skippage.o output.o scalewidth.o \
+	dosection.o dopage.o resident.o search.o unpack.o drawPS.o \
+	header.o makefont.o repack.o virtualfont.o dpicheck.o finclude.o \
+	pprescan.o papersiz.o flib.o color.o bbox.o emspecial.o t1part.o \
+	hps.o emtexdir.o emdir.o
+
+.PHONY: all allhps install installhps
+
+all : afm2tfm.exe dvi$(HPS)ps32.exe tex.pro texps.pro texc.pro \
+	special.pro finclude.pro color.pro crop.pro hps.pro
+
+allhps :
+	$(MAKE) -f makefile.emx all \
+	DHPS="-DHPS" \
+	HPS="h"
+
+installhps :
+	$(MAKE) -f makefile.emx install \
+	DHPS="-DHPS" \
+	HPS="h"
+
+# default rules
+
+.SUFFIXES: .o .c
+
+.c.o:
+	$(CC) -c $(CFLAGS) @paths.rsp $<
+
+dvi$(HPS)ps32.exe: $(OBJ)
+	$(CC) -o $@ $(OBJ) $(LINKOPT)
+	emxbind -s $@
+
+afm2tfm.exe: afm2tfm.c paths.rsp
+	$(CC) $(CFLAGS) @paths.rsp afm2tfm.c -o $@ $(LINKOPT)
+	emxbind -s $@
+
+#paths.rsp: pc\makefile.emx
+paths.rsp: makefile.emx
+	echo -funsigned-char> paths.rsp
+	echo -DSAWVER>> paths.rsp
+	echo -DCREATIONDATE>> paths.rsp
+	echo -DTFMPATH="$(TFMPATH)">> paths.rsp
+	echo -DPKPATH="$(PKPATH)">> paths.rsp
+	echo -DVFPATH="$(VFPATH)">> paths.rsp
+	echo -DHEADERPATH="$(HEADERPATH)">> paths.rsp
+	echo -DCONFIGPATH="$(CONFIGPATH)">> paths.rsp
+	echo -DCONFIGFILE="$(CONFIGFILE)">> paths.rsp
+	echo -DFONTSUBDIRPATH="$(FONTSUBDIRPATH)">> paths.rsp
+	echo -DFIGPATH="$(FIGPATH)">> paths.rsp
+	echo -DFLIPATH="$(FLIPATH)">> paths.rsp
+	echo -DFLINAME="$(FLINAME)">> paths.rsp
+
+$(OBJ) : dvips.h debug.h paths.h paths.rsp
+
+squeeze.exe : squeeze.c paths.rsp
+	$(CC) $(CFLAGS) @paths.rsp squeeze.c -o squeeze.exe
+
+tex.pro : tex.lpro squeeze.exe
+	squeeze tex.lpro  tex.pro
+
+texc.pro: texc.lpro squeeze.exe
+	squeeze texc.lpro texc.pro
+
+texc.lpro: tex.lpro
+	@echo This does "texc.scr tex.lpro texc.lpro" on Unix
+	@echo For MSDOS or OS/2, copy tex.lpro to texc.lpr
+	@echo then edit texc.lpr to remove the code
+	@echo for uncompressed fonts and uncomment the
+	@echo code for unpacking compressed fonts
+
+
+texps.pro : texps.lpro squeeze.exe
+	squeeze texps.lpro texps.pro
+
+special.pro : special.lpro squeeze.exe
+	squeeze special.lpro special.pro
+
+finclude.pro: finclude.lpro squeeze.exe
+	squeeze finclude.lpro finclude.pro
+
+color.pro: color.lpro squeeze.exe
+	squeeze color.lpro color.pro
+
+crop.pro: crop.lpro squeeze.exe
+	squeeze crop.lpro crop.pro
+
+hps.pro : hps.lpro squeeze.exe
+	squeeze hps.lpro hps.pro
+
+install : afm2tfm.exe dvi$(HPS)ps32.exe \
+	tex.pro texc.pro texps.pro special.pro finclude.pro color.pro crop.pro \
+	hps.pro psfonts.map epsf.tex epsf.sty rotate.tex rotate.sty \
+	dvips.tex dvipsmac.tex colordvi.sty colordvi.tex blackdvi.sty \
+	blackdvi.tex ad.enc
+	-mkdir $(TEXDIR)
+	-mkdir $(BINDIR)
+	-mkdir $(CONFIGPARENTDIR)
+	-mkdir $(CONFIGDIR)
+	-mkdir $(HEADERDIR)
+	-mkdir $(MANPARENTDIR)
+	-mkdir $(MANDIR)
+	-mkdir $(TEXMACROPARENTDIR)
+	-mkdir $(TEXMACRODIR)
+	copy afm2tfm.exe $(BINDIR)
+	copy dvi$(HPS)ps32.exe $(BINDIR)
+	copy *.pro $(HEADERDIR)
+	copy ad.enc $(HEADERDIR)
+	copy *.map $(CONFIGDIR)
+	copy psdraft.ps $(CONFIGDIR)
+	copy config.* $(CONFIGDIR)
+	copy *.sty $(TEXMACRODIR)
+	copy epsf.tex $(TEXMACRODIR)
+	copy rotate.tex $(TEXMACRODIR)
+	copy colordvi.tex $(TEXMACRODIR)
+	copy blackdvi.tex $(TEXMACRODIR)
+	copy dvipsmac.tex $(TEXMACRODIR)
+	copy dvips.tex $(MANDIR)
+	xcopy /s patch\pc\emtex $(TEXDIR)
+	@if not exist $(MANDIR)\dvips.ps $(MAKE) -f makefile.emx dvips.ps
+
+dvips.ps : $(MANDIR)\dvips.tex
+	runfor -C $(MANDIR) : @tex386 dvips.tex
+	runfor -C $(MANDIR) : @dvips dvips.dvi
+	@if exist $(MANDIR)\dvips.ps del $(MANDIR)\dvips.dvi
+	@if exist $(MANDIR)\dvips.ps del $(MANDIR)\dvips.log
+
+.PHONY: veryclean clean
+
+veryclean :
+	-del *.o
+	-del dvi*.exe
+	-del squeeze.exe
+	-del afm2tfm.exe
+	-del *.pro
+	-del paths.rsp
+
+clean :
+	-del *.o
+	-del dvi*.exe
+	-del squeeze.exe
+	-del afm2tfm.exe
+	-del paths.rsp
+
+
+.PHONY: dist zipexe zipsrc zipcontrib
+# create zip files
+dist:	zipexe zipsrc zipcontrib
+
+zipexe:
+	-mkdir $(TEXDIR)
+	-mkdir $(TEXDIR)\remove
+	-mkdir $(MANPARENTDIR)
+	-mkdir $(MANDIR)
+	-mkdir $(MANDIR)\hps
+	-mkdir $(TEXMACROPARENTDIR)
+	-mkdir $(TEXMACRODIR)
+	-mkdir $(TFMPARENTDIR)
+	-mkdir $(TFMDIR)
+	-mkdir $(VFPARENTDIR)
+	-mkdir $(VFDIR)
+	copy ..\PSlatex\*.* $(TEXMACRODIR)
+	copy ..\PStfms\*.* $(TFMDIR)
+	copy ..\PSvfs\*.* $(VFDIR)
+	copy README $(MANDIR)
+	copy pc\README.pc $(MANDIR)
+	copy patch\README.EMX $(MANDIR)
+	copy hps\CHANGES_HPS.txt $(MANDIR)\hps\changes.txt
+	copy hps\README_HPS.txt $(MANDIR)\hps\readme.txt
+	-del emtex\remove\$(DVIPSVER).rem
+	ls -lR emtex > emtex.lst
+	ls -lR texfonts >> emtex.lst
+	ls2rem emtex.lst emtex\remove\$(DVIPSVER).rem
+	-del emtex.lst
+	-del ..\dvipsexe.zip
+	zip -rD ..\dvipsexe.zip emtex texfonts -x *~
+
+zipsrc:
+	-del ..\patsrc.zip
+	runfor -C .. : @zip -rD patsrc.zip dvips/patch -x *~
+	copy patch\README.EMX ..
+
+zipcontrib:
+	-del ..\contrib.zip
+	runfor -C .. : @zip -rD contrib.zip dvips/contrib dvips/reencode -x *~
+
+# used for converting Unix EOL to OS/2 EOL
+# when dvips.tar has been extracted under OS/2.
+eol:
+	-flip -m *.*
+	cd contrib
+	-flip -m *.*
+	cd bbfig
+	-flip -m *.*
+	cd ..\psfig
+	-flip -m *.*
+	cd ..\psfntmac
+	-flip -m *.*
+	cd ..\pspic
+	-flip -m *.*
+	cd ..\..\mvs
+	-flip -m *.*
+	cd ..\pc
+	-flip -m *.*
+	cd ..\reencode
+	-flip -m *.*
+	cd ..\vmcms
+	-flip -m *.*
+	cd ..\vms
+	-flip -m *.*
+	cd ..

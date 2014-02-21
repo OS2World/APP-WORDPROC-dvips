@@ -1,0 +1,16 @@
+*** makefont.c.orig	Tue Nov  3 12:58:38 1998
+--- makefont.c	Thu Nov 19 04:30:34 1998
+***************
+*** 280,284 ****
+     if (dontmakefont == 0) {
+        if (mfjobname != (char *)NULL)
+!          mfjobout(name,t);
+        else
+           (void)system(buf) ;
+--- 280,285 ----
+     if (dontmakefont == 0) {
+        if (mfjobname != (char *)NULL)
+! 	 /* mfjobout(name,t); */
+! 	 mfjobout(name,(double)dpi/bdpi);	/* wkim */
+        else
+  	 (void)system(buf) ;

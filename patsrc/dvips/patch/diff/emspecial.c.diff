@@ -1,0 +1,66 @@
+*** emspecial.c.orig	Tue Nov  3 12:58:40 1998
+--- emspecial.c	Thu Nov 19 04:30:34 1998
+***************
+*** 9,12 ****
+--- 9,20 ----
+  extern FILE *search();
+  extern char *getenv();
++ 
++ #ifdef EMTEXDIR 	/* Wonkoo Kim (wkim+@pitt.edu), May 10, 1997 */
++ #include "emtexdir.h"
++ extern struct emtex_dir ed_figpath ;
++ extern FILE * emtex_dir_search() ;
++ #endif
++ #define MAXPATHLEN (256)
++ 
+  /*
+   *   These are the external routines called:
+***************
+*** 1409,1413 ****
+  float emwidth, emheight;	/* dimension in pixels */
+  {
+! 	char fname[80];
+  	int filetype;
+  	FILE *f;
+--- 1417,1421 ----
+  float emwidth, emheight;	/* dimension in pixels */
+  {
+! 	char fname[MAXPATHLEN];
+  	int filetype;
+  	FILE *f;
+***************
+*** 1419,1422 ****
+--- 1427,1433 ----
+  
+  	/* find the file */
++ #ifdef EMTEXDIR 	    /* Wonkoo Kim (wkim+@pitt.edu), May 10, 1997 */
++ 	f = emtex_dir_search(&ed_figpath, fname, READBIN);
++ #else
+  	f = search(figpath, fname, READBIN);
+  	if (f == (FILE *)NULL) {
+***************
+*** 1424,1427 ****
+--- 1435,1439 ----
+  		f = search(env,filename,READBIN);
+  	}
++ #endif
+  	/* if still haven't found it try adding extensions */
+  	if (f == (FILE *)NULL) {
+***************
+*** 1430,1433 ****
+--- 1442,1448 ----
+  		strcpy(fname, filename);
+  		strcat(fname, extarr[i]);
++ #ifdef EMTEXDIR 	    /* Wonkoo Kim (wkim+@pitt.edu), May 10, 1997 */
++ 		f = emtex_dir_search(&ed_figpath, fname, READBIN);
++ #else
+  		f = search(figpath, fname, READBIN);
+  		if (f == (FILE *)NULL) {
+***************
+*** 1435,1438 ****
+--- 1450,1454 ----
+  			f = search(env,filename,READBIN);
+  		}
++ #endif
+  		if (f != (FILE *)NULL)
+  		    break;

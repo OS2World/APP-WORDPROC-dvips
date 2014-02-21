@@ -1,0 +1,655 @@
+========================================================================
+DVIPS.DOC                    PC-DVIPS 5.58                OS/2, DOS, Win
+G. Sawade                        V 2.5                     30. Oct. 1995
+========================================================================
+
+
+
+
+1.   S Y S T E M - R E Q U I R E M E N T S 
+==========================================
+
+* IBM PC compatible computer, running DOS, OS/2 (>= 2.0) or Windows.
+
+* The filesystem is created for emTeX (>June 95), if you want to 
+  use dvips under other TeX implementations, you may need reading section
+  'Support of other TeX distributions'.
+
+
+
+2.   I N S T A L L A T I O N
+============================
+
+2.1  Your first installation
+
+Change to the drive (root directory), where emTeX is already installed, 
+unzip the archives with unzip! (unzip is part of the emtex distribution,
+here unzip means one of the your system matching executable, e.g. unzip32.exe):
+        > unzip dvipsini.zip    (.exe, .bat, .sty, .tex, ..., 
+                                 at least all you need to run dvips)
+        > unzip dvipsfnt.zip    (virtual fonts and tfm files)
+        > unzip dvipssrc.zip    (additional sources and patches)
+The files become extracted into 
+        \emtex          and subdirectories and
+        \texfonts       and subdirectories.
+If you want to use other directrories, proceed as described in the emtex
+documentation.
+
+
+2.2  Updating from dps558[bs] and dvipslib
+
+I would recommend the following procedure of updating. Use the 
+emremove.exe (from current emtex distribution):
+        > emremove -k \emtex\remove\dps558b.rem c:\
+        > emremove -k \emtex\remove\dps558s.rem c:\
+        > emremove -k \emtex\remove\dvipslib.rem c:\
+The -k option keeps changed files. Save these files left. Install the 
+new dvips packages and change the new files with respect of your
+modifications of former versions. This normally affects config.ps, 
+dvips.bat/cmd and maketexp.bat/cmd.
+NOTE:   dvips.{bat,cmd} are no more included in this distribution.
+        Config/Header files have moved into \emtex\data\dvips
+
+
+2.3  Updating from dvips.zip or dvipssrc.zip, dvipsexe.zip dvipsfnt.zip
+     (all 'beta' versions from 2.1 to 2.3x)
+
+Use
+        > emremove -k \emtex\remove\dvips.rem c:\
+or
+        > emremove -k \emtex\remove\dvipssrc.rem c:\
+        > emremove -k \emtex\remove\dvipsexe.rem c:\
+        > emremove -k \emtex\remove\dvipslib.rem c:\
+instead for removing the files.
+
+
+*** REMOVE THE SPECIFICATION OF ENVIRONMENT VARIABLE
+***             TEXCONFIG 
+*** FROM YOUR AUTOEXEC.BAT OR CONFIG.SYS !!!
+***
+*** This value is obsolete, dvips searches now its config files in
+*** $(EMTEXDIR)\data\dvips or \emtex\data\dvips by default.
+
+
+2.4  Installation of 32Bit extenders EMX or RSX
+
+The 32Bit executables make use of so called extenders. These could be 
+EMX.DLL under OS/2, EMX.EXE under DOS, RSX.EXE under DOS with DPMI (Dos 
+Protected Mode Interface), RSX.EXE -- or better RSXWIN.EXE -- under MS 
+Windows (3.0...NT). When you have already installed emTeX you have also
+installed the emxrsx.zip, comming together with emTeX. In this case step 
+over the rest of this subsection.
+
+When you need to install the emxrsx package, you should upload 
+        CTAN:/tex-archive/systems/msdos/emtex/emxrsx.zip.
+and unpack the archive on your emtex drive
+        > unzip emxrsx
+You'll find the documentation for emx in \emx\doc\emxrt.doc and for rsx 
+in \emtex\doc\rsx\*.txt. What's to do in brief is:
+        Add c:\emx\bin;c:\emtex\bin to your PATH variable
+Under OS/2
+        add c:\emx\dll to the LIBPATH statement of your config.sys
+Under DOS
+        remove BREAK=ON from config.sys
+Next reboot the system for the changes taking effect.
+
+If your DOS system is based upon a 32bit processor *without* a coprocessor,
+i.e. plain 386, 486SX and you want to use the 32bit executable for any 
+reason under EMX, you need to install the complete 'emxrt.zip' package. 
+emxrt's home site is
+        ftp://ftp.uni-stuttgart.de/pub/systems/os2/emx-0.9a/emxrt.zip
+It contains the FPU emulator that is required in this case.
+
+
+
+
+3.   D O C U M E N T A T I O N
+==============================
+
+If you want to use dvips for the first time, it might be really the right 
+moment to read its handbook \emtex\doc\dvips\dvips.{tex,dvi}. This book helps
+a lot when dvips won't do the job you intend and one learns much about its
+power, options and controls. A copy of this file (dvips.doc) file is in
+\emtex\doc\dvips\dvips.doc and information about building dvips yourself 
+can be found in \emtex\src\dvihps\read_me.
+
+
+
+
+4.   E N V I R O N M E N T   V A R I A B L E S
+==============================================
+
+dvips itself uses lots of variables if present. Here, only the variables 
+used by dvips to load configuration files and used by the batch and config.ps 
+files of this distribution are mentioned.
+
+name              default
+-----------------------------------------------------------------------
+EMTEXDIR          \emtex
+This value should already be set for your emTeX system. The config.ps 
+file refers often to that value as base path for all the necessary 
+subdirectories.
+
+DVIDRVFONTS       \texfonts
+This value  *must*  contain only a single path and is usually already
+in use for your emTeX system. (this *must* has nothing to do with emTeX, 
+it comes from the use of this value in maketexp.{bat.cmd}.)
+It is used by the maketexp scripts and by config.ps. It points to the 
+base path for pk font files and font libraries.
+
+DVIPS_STDERR      
+This is new. If required, DVIPS_STDERR should be set to a filename.
+dvips redirects its stderr output (all messages on the screen) into
+this file. This is my gift for all these DOS people, who cannot
+redirect stderr to a file using command.com.
+
+TEXCONFIG         $(EMTEXDIR)\data\dvips
+Where dvips searches for its config.ps, *.cfg and *.map files.
+
+DVIDRVGRAPH       
+GS_LIB            
+These values are not required, but are used in config.ps as additional 
+possible path entries where dvips could find 'header' files, such as .eps
+graphics or PostScript fonts files. (GS_LIB is used by GhostScript.)
+
+MAKETEXPK         maketexpk %n %d %b %m
+see section 'Automatic generation of fonts'
+
+T1FONTS          c:\psfonts
+This is used by the make_pk REXX script to locate the PostScript 
+type1-font source file for a missing font, see 'Automatic generation of 
+fonts'
+
+HOME             
+This is the directory, dvips searches for the user configuration file 
+dvips.ini in some cases (see next section).
+
+PRINTER          
+If this variable is set, dvips tries to load the file $(PRINTER).cfg
+instead of dvips.ini directly after loading config.ps.
+
+
+
+
+5.   R U N N I N G   D V I P S
+==============================
+
+The default path names dvips uses is now based upon the two important emtex
+environment variables only.
+
+EMTEXDIR points to the path where all emtex related stuff has been installed,
+this defaults to \emtex if not set.
+Example:        set EMTEXDIR=f:\emtex
+
+DVIDRVFONTS points to the pk fonts and fli files emtex's device driver use.
+This defaults to \texfonts if not set.
+Example:        set DVIDRVFONTS=f:\texfonts
+
+After loading config.ps, dvips checks if the user has set the environment 
+variable PRINTER, in this case it loads the file $(PRINTER).cfg if
+possible from the $(TEXCONFIG) directory. If no PRINTER value has been 
+set, dvips tries to open dvips.ini from the config path -- or when
+$(HOME) has a value from there instead.
+NOTE: dvips.ini becomes not loaded, when PRINTER has a value and/or an expicit
+configuration has been specified by the -P<printer> commandline option.
+
+Once the installation is complete and the EMTEXDIR value is set, test
+if dvips runs (which should happen on a standard emTeX installation :-)
+The plain command
+        > dvips16
+shows you version and options of the 16bit dvips.exe program and/or
+        > dvips32
+for the 32bit version.
+
+If this does not work, see -> Problems A) below.
+If anything worked fine, you are ready for the next steps.
+('dvips' means either dvips16.exe or dvips32.exe)
+        > cd \emtex\doc\dvips
+        > dvips adjust       (you'll get 'adjust.ps')
+        > dvips dvips        (and dvips.ps)
+If this fails, you should read -> Problems B) below, otherwise print 
+adjust.ps as usual on a PostScript device or via GhostScript. Check if 
+the papersize is set correctly in your config.ps file.
+
+
+
+
+6.   P R O B L E M S
+====================
+
+6.1  dvips32 does not run at all
+
+- If you have problems with DPMI (usually under Windows) messages like: 
+  'rsx not found, DPMI not supported by emx' you should install and use
+  rsx.exe instead of emx.exe by
+        > set RSX=C:\RSX\BIN\RSX.EXE
+  see also: c:\emtex\doc\rsx\install.txt, c:\emx\doc\emxrt.doc)
+
+- If you do not have installed a numerical coprocessor under DOS (dvips 
+  stops with '... SIGFPE ...') EMX is unable to activate its fpu emulation.
+  Try using RSX instead, but you need a DPMI server. Otherwise check first, 
+  if you are running EMX in revision 30 or higher with
+        > set EMXOPT=-V
+        > dvips32
+  look at the first output line. The file emxfpemu should be in %EMXPATH%,
+  usually c:\emx\bin. I' like to recommend using the 16Bit executable of
+  dvips16.exe (by Eberhard Mattes), which runs faster in this case.
+
+
+6.2  dvips16.exe / dvips32.exe runs but gives errors
+
+- Some environment variables or the corresponding values in config.ps
+  have not been correctly set, that means dvips can not find files, fonts
+  or whatever. Call dvips with its debug option '-d 2' which reports the
+  path search for more information.
+  The -d 2 option has been improved:
+  - Any replacement of default values or values from config files by
+    environment variables is reported.
+  - The directory lists used by emtex's search routines are shown.
+  - The results of filesearching are reported.
+
+  For further information you may find the '-d 64' option useful, that reports
+  all (which could be really many!) files dvips tries to open.
+
+  If you are running dvips under DOS and you don't like so much messages
+  scrolling over your screen, use 'SET DVIPS_STDERR=dvips.log' to redirect
+  the output to a file dvips.log.
+  (after debugging: 'SET DVIPS_STDERR=' :-)
+
+  Possibly some dvips assumptions are not correct. Check
+  \emtex\bin\set-tex.{bat,cmd} and/or the settings in autoexec.bat or
+  config.sys, especially the values EMTEXDIR and DVIDRVFONTS. The default
+  built-in values are \emtex and \texfonts, respectively.
+
+- Your emTeX is  N O T  installed in directory $(EMTEXDIR)
+- Your file arrangements are somewhat individual
+see next section 'Customizing dvips'
+
+
+
+
+7.   C U S T O M I Z I N G   D V I P S
+======================================
+
+dvips is controlled by config files and environment variables. The 
+submitted config.ps file uses (nearly) the same values as dvips has been 
+compiled with. If you use emTeX with its environment variables EMTEXDIR
+and DVIDRVFONTS set correctly, no changes might be necessary. For other 
+environments, check which variables are refered to by config.ps and 
+customizing of dvips is very easy, since (this) dvips supports...
+
+
+7.1  Variable Expansion.
+
+An entry ...$(FOO)... within a path entry of config.ps or a corresponding
+environment variable is expanded into the contents of FOO. Don't worry 
+about emTeX's special control character '!' in path names since (this) 
+dvips supports ...
+
+
+7.2  Searching files in subdirectories.
+
+An '!' as last character of a path starts additional searching of files 
+in the next subdirectory level. Two '!' introduce searching recursively
+in all levels of subdirectories.
+=======================================================================
+        EXCEPT the path entries for individual pk fonts (pkpath).
+=======================================================================
+
+A valid entry for the tfm font files might be
+        T $(TEXTFM)                     in config.ps or
+        > set TEXFONTS=$(TEXTFM)        as environment variable
+if TEXTFM contains 'C:\EMTEX\TFM!;d:\USR\TFM!!' for instance.
+
+Don't forget to set up your default papersize as described in the last 
+part of config.ps. The papersize affects upper and left margins of your 
+output!
+
+
+
+8.   S E T T I N G   U P   A   P R I N T E R 
+============================================
+
+dvips comes with a (built-in and predefined) setup for 300DPI laserjet 
+printer, using US Letter paper. I added two additional example config 
+files dj.cfg and lj4.cfg, which change the settings for using a 300DPI 
+deskjet and 600DPI laserjetIV printer, both using A4 paper. Refer these 
+files to see the interesting few parameters. These config files become
+activated, when dvips is called with option '-P dj' or '-P ljh', respectively.
+I'd like to recommend, that one should edit an own file dvips.ini, 
+containing only the changes of values from config.ps for his/her default 
+printer. dvips.ini is loaded after config.ps and I will newer include a 
+dvips.ini file into the dvips distribution. I think, this is a relatively 
+save and easy method for updates.
+
+If your printer supports different paper trays, you might want to select
+the papersize as PostScript code (the default (a4paper) only writes a
+comment). This is done by the option -t a4, which can also be used in 
+config files (without hyphen).
+
+
+
+9.   S U P P O R T   O F   O T H E R   T E X   D I S T R I B U T I O N S
+========================================================================
+
+NOTE: The batch files and programs have been unzipped into \emtex\bin.
+      You have to set your PATH entry pointing to that directory, too.
+
+This part is a bit experimental. Please, be careful and send me any 
+suggestions by email. Important for other TeX's is the following dvips 
+related extract of the directory hierarchy of emTeX/dvips:
+
+emTeX's directories         and contents
+
+emtex\bin:                      binaries (*.exe *.bat *.cmd)
+emtex\doc\dvips:                adjust.dvi dvips.dvi
+emtex\data\dvips:               dvips config/header files
+emtex\texinput\dvips:           dvips related *.tex *.sty
+emtex\tfm\dvips:                dvips related *.tfm
+texfonts\pixel.lj:              Pixel-Fonts for LaserJet, for instance:
+                                texfonts\pixel.lj\300dpi\cmr10.pk
+texfonts\vf:                    virtual Fonts (*.vf)
+
+This knowledge should make you able to copy the diverse files into 
+appropriate places of your distribution, but I would not recommend 
+changes of the filesystem itself since there are mainly the following 
+three disadvantages:
+
+1. You have to do the same procedure (as last year...) when a new dvips 
+becomes released.
+
+2. You have to change the path names in the remove (*.rem) files for
+being able to use emTeX's powerful 'emremove.exe' (not included).
+
+3. Since tex and dvips can be controled by lots of parameters (files 
+and/or settings), one can easily confuse the former working TeX/dvips 
+system when changing a bit too much.
+
+I modified the config.ps file, which now contains some additional entries 
+for PCTeX. The following directory mappings have been assumed:
+
+emTeX:                       -> PCTeX:
+
+emtex/bin:                   -> pctex/bin
+emtex/doc/dvips:             -> pctex/doc
+emtex/data/dvips:            -> pctex/
+emtex/texinput/dvips:        -> pctex/tex (*.tex) &  pctex/latex (*.sty)
+emtex/tfm/dvips:             -> pctex/textfms
+texfonts/pixel.lj:           -> pctex/pixel
+  ..pixel.lj/300dpi/cmr10.pk ->   ..pixel/dpi300/cmr10.pk
+ (../pixel.lj/%ddpi/%f.%p)   ->  (..pixel/dpi%d/%f.%p
+texfonts/vf:                 -> ???
+
+Please tell me your suggestions ...
+I hope this helps a little using this dvips without emTeX.
+
+
+I recieved a note about using dvips under TeXas by Joe Dewitte.
+The document is included as /emtex/doc/dvips/4TeXas.txt
+
+
+
+10.   A U T O M A T I C   G E N E R A T I O N   O F   F O N T S
+===============================================================
+
+10.1  a) maketexp.bat and maketexp.cmd
+
+By default a batch file 'MakeTeXPK' becomes invoked when a font is 
+missed. This fails normally, since DOS does not support such 'giant' file 
+names. The command invoked by dvips can be set by the envirnoment 
+variable 'MAKETEXPK':
+        > SET MAKETEXPK=maketexp %n %d %b %m            (OS/2)
+        > SET MAKETEXPK=maketexp %%n %%d %%b %%m        (DOS)
+should do the job, where %n is a placeholder for font name, %d for 
+required resolution, %b for basic resolution and %m for magnification.
+
+The maketexp.bat/cmd you got with this version are just right to create 
+fonts in this way. Possibly you have to change the batch file, if your 
+font directory is not defined by %DVIDRVFONTS%\PIXEL.LJ or if you like 
+to let mfjob create the tfm and log files also. By default the batch
+files only write a file dvips.mfj for later use for the mfjob program. If
+you want them to call mfjob to create the fonts 'on the fly', you have
+to uncomment the lines
+        REM mfjob dvips
+        REM del dvips.mfj
+just after
+        echo Run "mfjob dvips"
+at the bottom of maketexp.bat/cmd.
+
+
+      b) make_pk.cmd
+
+I have included an OS/2 REXX script make_pk.cmd, which works nearly
+like maketexp.cmd, except that it calls ps2pk if a metafont source for a 
+font couldn't be found. ps2pk creates a pk file from a PostScript Type-1 
+font program and is availabe from 
+        CTAN:/tex-archive/systems/os2/binaries/ps2pk.exe
+The make_pk script may help those, who want to use PS fonts on a non-PS 
+printer/previewer without GhostScript. To select this you have to
+        > SET MAKETEXPK=make_pk %n %d %b %m             (OS/2 only !!!)
+To let make_pk generate the missing PostScript fonts as pk files you need 
+to deactivate dvips's reading of psfonts.map. This is done by the config.ps
+option 'p nothing'. The dj.cfg file has been prepared for this task, you 
+just have to remove the commenting asterisk. make_pk generates fonts for 
+which it finds an entry in psfonts.map. The PostScript fonts (.pfb, .pfm) 
+are expected to be in T1INPUTS which defaults to c:\psfonts.
+This script produces some comments or error messages and one can easily 
+see what goes wrong.
+The script was originally written by Sebastian Rahtz,
+        CTAN:/tex-archive/systems/os2/binaries/maketexpk.cmd
+but he has no more the possibility to help with it.
+
+
+10.2  dvidrv dvips16.exe  or  dvidrv dvips32.exe
+The dvidrv of emTeX can be used for calling dvips; this is done by
+        > dvidrv dvips16 <options> <file>
+or
+        > dvidrv dvips32 <options> <file>
+If fonts go amiss, dvips reports this to dvidrv and dvidrv asks you
+if you want to create the fonts. In this case, the metafont and collegues
+affecting parameters set by the dvidrv program and should be correct.
+
+
+
+
+11.  P S N F S S   A N D   D V I P S 
+====================================
+
+The following steps are required for typesetting LaTeX documents with
+PostScript fonts.
+
+(1) Install PSNFSS from tex-archive/macros/latex/packages/psnfss
+
+(2) get the font files from tex-archive/psfonts/<foundry>/... 
+(you'll find several subdirectories for each font <name>) and
+install them in their appropriate places (.tfm, .vf, .map, .fd/.sty).
+An example for Times:
+ ../adobe/times/tfm/*.tfm       ->      %EMTEXDIR%\TFM\adobe
+ ../adobe/times/vf/*.vf         ->      %TEXFONTS%\VF\adobe
+ ../adobe/times/dvips/*.map     ->      %EMTEXDIR%\DATA\DVIPS
+ ../adobe/times/sty/*.sty       ->      %EMTEXDIR%\TEXINPUT\PSNFSS
+ ../adobe/times/sty/*.fd        ->      %EMTEXDIR%\TEXINPUT\PSNFSS
+
+(3) make the fonts known for dvips by activating the fontmap file(s).
+I recommend to remove all <shortname>.cfg or config.<shortname> files and 
+to collect all *.map files into a single psnfss.map. I have done this 
+already for all files in the <foundry>=adobe directory. The fontmap file 
+psnfss.map is included in this distribution.
+NOTE: I've done this for the betaversion of the metrics, be careful.
+It has not been tested with the current version.
+
+(4) copy the ../tools/8r.enc encoding description into the place dvips
+looks for header files, i.e. \emtex\data\dvips
+
+(5) For activating the psnfss.map file you can call dvips with the
+additional commandline option -P psnfss which invokes loading of 
+psnfss.cfg to make psnfss.map the current fontmap instead of psfonts.map.
+Possibly you may want to use the psnfss.map always, just add a line
+        p psnfss.map
+to your preferred config file (config.ps, dvips.ini, etc.).
+
+
+When you want to use a config file from the metrics distribution, you
+should rename them like
+        config.<shortname>      into            <shortname>.cfg
+to let them be accessible for this DOSish dvips.
+
+Special care must be taken for different style files with the same name.
+Best may be to delete the .sty files from \emtex\texinputs\dvips.
+
+
+
+
+12.   H Y P E R T E X   &   D V I P S
+=====================================
+
+On CTAN is some stuff available, called 'hypertex' in
+        /tex-archive/support/hypertex
+There are macros for plain and latex to support hyperlinks as 
+\special{html:..} commands. dvips16.exe and dvips32.exe have been
+compiled based on the sources of dvihps from this directory.
+
+When using the hypertex option '-z' PostScript files become generated,
+that can be converted to PDF files by Adobes distiller.
+
+I have no access to a distiller program, but the -z option has been
+succesfully tested by Tamas Bori.
+
+
+
+
+
+13.   I N F O R M A T I O N   A B O U T   T H I S   V E R S I O N
+=================================================================
+
+dvips32.exe and dvips16.exe base mainly on sources by Thomas Rockicki (dvips)
+and patches by Mark Doyle (HyperDVIPS).
+
+The basic port to OS/2 and DOS was done by Russel Lang.
+
+dvips16.exe has been compiled with MSC by Eberhard Mattes and dvips32.exe
+with emx/gcc 0.9a(5) by myself, both containing many patches and improvements
+with respect for good support of emTeX under DOS and OS/2.
+  Former versions of dvips16 and code for directory expansion with
+  Turbo-C were supported by Matthias Eckermann.
+
+The source code for emtex's directory search routines (em*dir.{c,h}) was 
+written and donated to the public domain by Eberhard Mattes .
+
+Enjoy.                        Guido Sawade <sawade@physik.tu-berlin.de>
+
+
+
+
+14.    M A I L I N G L I S T S
+==============================
+
+The 'dvips32' mailing list has been created for information about bugs 
+and updates from me to its users. The list is intend for 'listening'
+only. (You do not need to subscribe as subscriber of emtex-user, except
+you like to act as a tester for prereleases :)
+
+The 'emtex-user' mailing list is well known as *the* forum for news and
+discussion about emtex itself and related problems.
+
+Just write mail to Majordomo@physik.tu-berlin.de with the text
+        INFO emtex-user
+        INFO dvips32
+        HELP
+        END
+in the body to get information about the lists and how to subscribe.
+
+
+
+
+15.   H I S T O R Y
+===================
+
+V 1.2                   (dps5497b.zip, dps5497s.zip, dvipslib.zip)
+initial release of dvips5.497
+         
+V 1.3                   (dps5499b.zip)
+compiled with emx/gcc 08.h(9). squeeze.exe removed. dvips.bat/dvips.cmd 
+changed. rsx.zip included (dvips32.exe runs under DOS-DPMI and Windows)
+
+V 1.4                   (dps555b.zip, dps555s.zip, dvipslib.zip)
+The new Version 5.55 of dvips is now available. The archives contain
+now emTeX-style *.REM files for removal of all archive contents.
+
+V 1.5                   (dps555b.zip, dps555s.zip)
+A change in dvips.c has been necessary. Now dvips32.exe can be called by 
+emTeX's dvidrv and the automatic font generation works correctly.
+
+V 1.6                   (dps555b.zip, dps555s.zip)
+Changed search.c allows now correct location of files which are specified 
+by a complete path (like /mypics/data/plot1.eps). A newer rsx (now RSX32 
+Beta4) is included.
+
+V 1.7                   (dps558b.zip, dps558s.zip)
+Now dvips-5.58. Bug in dvips.bat/dvips.cmd corrected. In dvips.bat/.cmd 
+no default offset is set.
+
+V 1.8                   (dps558b.zip, dps558s.zip)
+emx/gcc0.9a(2) used: Supports 386 without copro! Not so much pre-sets in 
+dvips.bat/cmd. config.ps supports PCTeX (I hope). RSX/EMX are now 
+included as extra zip's, prevents for unwanted 'downdating' of already 
+installed versions.
+
+V 1.9                   (dps558b.zip, dps558s.zip)
+(resident.c) Expanding of variables in dvips's environment and config.ps 
+entries. Using a patched emx/gcc (Thanks to Eberhard Mattes) without the 
+V1.8 -p/-l options affecting sscanf-Bug.
+V 1.95                  (dps558b.zip, dps558s.zip)
+(search.c) Expanding of subdirectories (one level only) when file search 
+function finds '!' or '!!' at end of a search path.
+
+V 2.00                  (dps558b.zip, dps558s.zip)
+Bug in makefont.c corrected. The sources have been succesfully compiled 
+with TURBO-C for 16Bit dvips by Matthias. (Many thanks for a long night, 
+fighting with expanding subdirectories :) Changed dvips.tex which now 
+creates the hidden 'DOS/OS2' parts of dvips.tex, due to a hint by Staszek
+Wawrykiewicz.
+
+V 2.10          10.3.95 (dps558b.zip, dps558s.zip)
+Default setting of config.ps value 'P' (pk fonts search) works now as 
+expected (makefile.saw). Bug in dvips.c (options -pj=, -pv=) corrected.
+
+_______________________________________________________________________
+
+ LAST VERSION BEFORE CHANGING THE ARRANGEMENTS OF FILES AND ARCHIVE(S)
+_______________________________________________________________________
+
+
+V 2.2beta               (dvips.zip)
+Many changes with respect to emTeX's new betatest release. File 
+arrangements changed, default lasterjet  mode in config.ps changed. 
+Additional lj4.cfg file for printing on 600 DPI LaserJetIV. BUG fixed: 
+Stripping of long filenames containing a drive letter have been stripped 
+too much :) in the past.
+
+V 2.3beta       15.5.95 (dvipsexe.zip, dvipssrc.zip, dvipsfnt.zip)
+Well, my decision of making only one archive introduced many, many mails. 
+I give up, now again three parts, but named other :). Sebastian Rahtz' 
+maketexpk.cmd as make_pk.cmd included. Experimental dvihps32.exe 
+included. Again: changes in maketexp.* and dvips.*. Subdirectory 
+expansion bug corrected (didn't expand dirnames containing '.'). The 
+16Bit executables (dvi(h)ps16.exe, afm2tfm.x16) are now included, while 
+the EMX and RSX packages are not.
+
+V 2.4..2.45  unpublished
+
+V 2.5           30.10.95 (dvipsini.zip, dvipssrc.zip, dvipsfnt.zip)
+Some cosmetics. Now compiled based on dvihps sources. Some aid for
+PSNFSS added. Missing fonts message is more clearly (for None-UNIX 
+people). dvips.{bat,cmd} removed. emtex searching routines implemented. 
+LaserJet IV config file renamed to ljh.cfg (formerly lj4.cfg).
+Redirection of stderr facillity for DOS users. Debug output (-d 2) improved.
+Many thanks to the alpha testing staff, especially Santiago Vila Doncel who 
+made several helpfull suggestions on the dvips.doc and to Eberhard Mattes for 
+the 16bit version and his emtex directory routines.
+
+
+========================================================================
+EOF                           DVIPS.DOC                        G. Sawade
+========================================================================
+

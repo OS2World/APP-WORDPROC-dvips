@@ -1,0 +1,37 @@
+*** t1part.h.orig	Tue Nov  3 12:58:42 1998
+--- t1part.h	Thu Nov 19 04:30:36 1998
+***************
+*** 28,39 ****
+  
+  #ifdef DVIPS
+  extern FILE *search();
+  extern char *headerpath ;
+  #define psfopen(A,B) search(headerpath,A,B)
+  #else
+  #define psfopen(A,B)  fopen(A,B)
+  #endif
+  
+! #ifdef DOS
+  #define OPEN_READ_BINARY "rb"
+  #else
+--- 28,47 ----
+  
+  #ifdef DVIPS
++ #ifdef EMTEXDIR
++ /*  Wonkoo Kim (wkim+@pitt.edu), May 3, 1997 */
++ #include "emtexdir.h"
++ extern struct emtex_dir ed_headerpath;
++ extern FILE * emtex_dir_search();
++ #define psfopen(A,B) emtex_dir_search(&ed_headerpath,A,B)
++ #else
+  extern FILE *search();
+  extern char *headerpath ;
+  #define psfopen(A,B) search(headerpath,A,B)
++ #endif
+  #else
+  #define psfopen(A,B)  fopen(A,B)
+  #endif
+  
+! #if defined(DOS) || defined(MSDOS) || defined(OS2)
+  #define OPEN_READ_BINARY "rb"
+  #else

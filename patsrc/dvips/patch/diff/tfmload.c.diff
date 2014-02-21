@@ -1,0 +1,50 @@
+*** tfmload.c.orig	Tue Nov  3 12:58:38 1998
+--- tfmload.c	Thu Nov 19 04:30:36 1998
+***************
+*** 24,27 ****
+--- 24,34 ----
+  static char name[50] ;
+  
++ #ifdef EMTEXDIR
++ /*	sawade@physik.tu-berlin.de	25-sep-95	*/
++ #include "emtexdir.h"
++ extern struct emtex_dir ed_tfmpath ;
++ extern FILE * emtex_dir_search() ;
++ #endif
++ 
+  /*
+   *   Tries to open a tfm file.	Uses cmr10.tfm if unsuccessful,
+***************
+*** 43,47 ****
+     (void)sprintf(name, "%s.tfm", n) ;
+  #endif
+!    if ((tfmfile=search(d, name, READBIN))==NULL) {
+        (void)sprintf(errbuf, "Can't open font metric file %s%s",
+               fd->area, name) ;
+--- 50,61 ----
+     (void)sprintf(name, "%s.tfm", n) ;
+  #endif
+! 
+! #ifdef EMTEXDIR
+! /*  using emtex_dir_search instead of search.	    sawade 25-sep-95 */
+!    if ((tfmfile=emtex_dir_search(&ed_tfmpath,name,READBIN))==NULL)
+! #else
+!    if ((tfmfile=search(d, name, READBIN))==NULL)
+! #endif
+!    {
+        (void)sprintf(errbuf, "Can't open font metric file %s%s",
+  	     fd->area, name) ;
+***************
+*** 51,56 ****
+--- 65,75 ----
+        if ((tfmfile=search(d, "tfm(cmr10)", READBIN))==NULL)
+  #else
++ #ifdef EMTEXDIR
++ /*  using emtex_dir_search instead of search.	    sawade 25-sep-95 */
++       if ((tfmfile=emtex_dir_search(&ed_tfmpath,"cmr10.tfm",READBIN))==NULL)
++ #else
+        if ((tfmfile=search(d, "cmr10.tfm", READBIN))==NULL)
+  #endif
++ #endif
+  	 error(
+  	  "! I can't find cmr10.tfm; please reinstall me with proper paths") ;

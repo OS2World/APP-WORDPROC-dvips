@@ -1,0 +1,49 @@
+*** finclude.c.orig	Tue Nov  3 12:58:38 1998
+--- finclude.c	Thu Nov 19 04:30:34 1998
+***************
+*** 19,22 ****
+--- 19,29 ----
+  #endif
+  
++ #ifdef EMTEXDIR
++ /*	sawade@physik.tu-berlin.de	26-sep-95	*/
++ #include "emtexdir.h"
++ extern struct emtex_dir ed_figpath ;
++ extern FILE * emtex_dir_search() ;
++ #endif
++ 
+  double atof();
+  /*
+***************
+*** 430,434 ****
+--- 437,446 ----
+        to_close = USE_PCLOSE ;
+     } else {
++ #ifdef EMTEXDIR
++ /*  using emtex_dir_search instead of search.	    sawade 26-sep-95 */
++       f = emtex_dir_search(&ed_figpath, filename, READ);
++ #else
+        f = search(figpath, filename, READ);
++ #endif
+     }
+     if (f) {
+***************
+*** 478,482 ****
+  #endif  /* DEBUG */
+       }
+!      close_file(f) ;
+     }
+     curfnt = oldcf;
+--- 490,501 ----
+  #endif	/* DEBUG */
+       }
+!      /* close_file(f) ; */
+!      if (to_close == USE_PCLOSE) {
+! 	/* Wonkoo Kim (wkim+@pitt.edu), May 11, 1997 */
+! 	/* purge remaining data from popened stream  */
+! 	while (fread(p,sizeof(char),500,f) == 500) ;
+! 	pclose (f);
+!      } else
+! 	fclose (f);
+     }
+     curfnt = oldcf;

@@ -1,0 +1,10 @@
+*** dvips.tex.orig	Tue Nov  3 12:58:38 1998
+--- dvips.tex	Thu Nov 19 04:30:32 1998
+***************
+*** 5,8 ****
+--- 5,9 ----
+  \newif\ifgeneric\genericfalse
+  \ifx\ntmanloaded Y\else\input dvipsmac \fi % uh oh, no macros, give our own.
++ \genericfalse
+  %
+  %   Finally, the document itself.

@@ -1,0 +1,200 @@
+*** search.c.orig	Tue Nov  3 12:58:38 1998
+--- search.c	Thu Nov 19 04:30:36 1998
+***************
+*** 14,17 ****
+--- 14,21 ----
+  #endif
+  
++ #if defined OS2 || defined MSDOS
++ #include <string.h>
++ #endif
++ 
+  #if defined(SYSV) || defined(VMS) || defined(__THINK__) || defined(MSDOS) || defined(OS2) || defined(ATARIST)
+  #define MAXPATHLEN (2000)
+***************
+*** 19,22 ****
+--- 23,35 ----
+  #include <sys/param.h>		/* for MAXPATHLEN */
+  #endif
++ 
++ /*
++  * sawade@physik.tu-berlin.de	25-sep-95
++  */
++ #ifdef EMTEXDIR
++ #include "emtexdir.h"
++ extern struct emtex_dir ed_figpath, ed_pictpath, ed_headerpath ;
++ #endif
++ 
+  #if !defined(MSDOS) && !defined(OS2)
+  #ifndef VMS
+***************
+*** 85,89 ****
+              strcat(cmd, file) ;
+              fclose(fd) ;
+!             fd = popen(cmd, "r") ;
+              to_close = USE_PCLOSE ;
+              free(cmd) ;
+--- 98,102 ----
+  	    strcat(cmd, file) ;
+  	    fclose(fd) ;
+! 	    fd = popen(cmd, mode) ;
+  	    to_close = USE_PCLOSE ;
+  	    free(cmd) ;
+***************
+*** 96,107 ****
+  
+  #if defined MSDOS || defined OS2 || defined(ATARIST)
+!    if ( isalpha(file[0]) && file[1]==':' ) {   /* if full path name */
+!       if ((fd=fopen(file,mode)) != NULL) {
+!          strcpy(realnameoffile, file) ;
+!          return(fd) ;
+!       } else
+!          return(NULL) ;
+!    }
+!    if (*file == '/') {/* if full path name with unix DIRSEP less drive code */
+        if ((fd=fopen(file,mode)) != NULL) {
+           strcpy(realnameoffile, file) ;
+--- 109,114 ----
+  
+  #if defined MSDOS || defined OS2 || defined(ATARIST)
+!     if ( (isalpha(file[0]) && file[1]==':')   /* if full path name */
+! 	   || *file == '/' || *file == '\\' ) {   /* or path from root, sawade 10/94 */
+        if ((fd=fopen(file,mode)) != NULL) {
+  	 strcpy(realnameoffile, file) ;
+***************
+*** 127,130 ****
+--- 134,143 ----
+  		  home = newstring(home) ;
+  	       else
++ #if defined MSDOS || defined OS2
++ /*	Under dos / os2 better use TEXCONFIG, when HOME is empty, saw 31-7-95	 */
++ 		  if (0 != (home = getenv("TEXCONFIG")))
++ 		     home = newstring(home) ;
++ 		  else
++ #endif
+  		  home = "." ;
+  	    }
+***************
+*** 223,227 ****
+              strcat(cmd, file) ;
+              fclose(fd) ;
+!             fd = popen(cmd, "r") ;
+              to_close = USE_PCLOSE ;
+           }
+--- 236,240 ----
+  	    strcat(cmd, file) ;
+  	    fclose(fd) ;
+! 	    fd = popen(cmd, mode) ;
+  	    to_close = USE_PCLOSE ;
+  	 }
+***************
+*** 236,239 ****
+--- 249,303 ----
+  }		/* end search */
+  
++ /*
++  * And this is used instead, if EMTEXDIR is defined.
++  * emtex style directory search.
++  * sawade@physik.tu-berlin.de	25-sep-95
++  *
++  * gzipped/compressed file (*.gz or *.Z) support for OS/2
++  * -- Wonkoo Kim (wkim+@pitt.edu), May 9, 1997
++  */
++ #ifdef EMTEXDIR
++ FILE * emtex_dir_search(list, file, mode)
++ 	struct emtex_dir *list ;
++ 	char *file, *mode ;
++ {
++     register FILE *fd ; 		 /* file desc of file */
++     int len = strlen(file) ;
++     int tryz = 0 ;
++ #ifdef OS2
++     if (_osmode == OS2_MODE && len >= 3 &&
++ 	    ((file[len-2] == '.' && (file[len-1] == 'Z' || file[len-1] == 'z')) ||
++ 	     (file[len-3] == '.' && (file[len-2] == 'g' || file[len-2] == 'G') &&
++ 				    (file[len-1] == 'z' || file[len-1] == 'Z'))) &&
++ 	     (list==&ed_figpath || list==&ed_pictpath || list==&ed_headerpath))
++ 	tryz = file[len-2] ;
++ #endif
++     to_close = USE_FCLOSE ;
++ #ifdef DEBUG
++     if (dd(D_PATHS))
++ 	(void)fprintf(stderr,"\nemtex_dir_search: Trying to locate %s\n", file) ;
++ #endif
++     if( emtex_dir_find(realnameoffile, sizeof(realnameoffile), list, file, EDF_CWD) ) {
++ #ifdef DEBUG
++ 	if (dd(D_PATHS))
++ 	    (void)fprintf(stderr,"        -> found: %s\n", realnameoffile);
++ #endif
++ 	if ((fd=fopen(realnameoffile,mode)) != NULL) {
++ 	    if (tryz) {
++ 		char *cmd = mymalloc(strlen(realnameoffile) + 20) ;
++ 		strcpy(cmd, (tryz=='.' ? "compress -d <" : "gzip -dc ")) ;
++ 		strcat(cmd, realnameoffile) ;
++ 		fclose(fd) ;
++ 		fd = popen(cmd, mode) ;
++ 		to_close = USE_PCLOSE ;
++ 		free(cmd) ;
++ 	    }
++ 	    return (fd);
++ 	}
++     }
++     return(NULL);
++ }
++ #endif
++ 
+  FILE *
+  pksearch(path, file, mode, n, dpi, vdpi)
+***************
+*** 279,282 ****
+--- 343,352 ----
+  		  home = newstring(home) ;
+  	       else
++ #if defined MSDOS || defined OS2
++ /*	Under dos / os2 better use TEXCONFIG, when HOME is empty, saw 31-7-95	 */
++ 		  if (0 != (home = getenv("TEXCONFIG")))
++ 		     home = newstring(home) ;
++ 		  else
++ #endif
+  		  home = "." ;
+  	    }
+***************
+*** 448,451 ****
+--- 518,525 ----
+     ns = np;
+     nd = nbuf;
++    if (*(ns+1) == ':') {        /* If the filename starts with a        */
++       *nd++ = *ns++;		/* Drive-Letter specification,		*/
++       *nd++ = *ns++;		/* pass these two charcters whithout	*/
++    }				/* truncation.		 saw 24-3-95	*/
+     ni = 0;
+     while ((*ns!='.') && (*ns) && (ni<8)) {
+***************
+*** 473,476 ****
+--- 547,551 ----
+        strcpy(np,nbuf);
+        /* now code copied from my_real_fopen() */
++ #ifdef DEBUG	/* Added for proper compilation without DEBUG defined, saw 23-5-95 */
+        if (dd(D_FILES)) {
+  	 fprintf(stderr, "<%s(%s)> ", n, t) ;
+***************
+*** 482,485 ****
+--- 557,561 ----
+        }
+        else
++ #endif	      /* dito, saw 23-5-95 */
+  	 tf = fopen(n, t) ;
+        return tf;
+***************
+*** 493,497 ****
+  {
+     switch(to_close) {
+! case USE_PCLOSE:  return pclose(f) ;
+  case USE_FCLOSE:  return fclose(f) ;
+  default:          return -1 ;
+--- 569,573 ----
+  {
+     switch(to_close) {
+! case USE_PCLOSE:  fflush(f);  return pclose(f) ;
+  case USE_FCLOSE:  return fclose(f) ;
+  default:	  return -1 ;

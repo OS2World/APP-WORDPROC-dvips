@@ -1,0 +1,464 @@
+*** output.c.orig	Tue Nov  3 12:58:38 1998
+--- output.c	Thu Nov 19 04:30:36 1998
+***************
+*** 9,12 ****
+--- 9,17 ----
+  #include "dvips.h" /* The copyright notice in that file is included too! */
+  #include <ctype.h>
++ #if defined(MSDOS)||defined(OS2)
++ /* setmode()	-- Wonkoo Kim (wkim+@pitt.edu), November 30, 1997 */
++ #include <io.h>
++ #include <fcntl.h>
++ #endif
+  
+  #ifdef OS2
+***************
+*** 17,20 ****
+--- 22,34 ----
+  #endif
+  #endif
++ 
++ #ifdef EMTEXDIR
++ /*	sawade@physik.tu-berlin.de	26-sep-95	*/
++ #include "emtexdir.h"
++ extern struct emtex_dir ed_figpath ;
++ extern struct emtex_dir ed_headerpath ;
++ extern FILE * emtex_dir_search() ;
++ #endif
++ 
+  /*
+   *   The external routines called here:
+***************
+*** 113,116 ****
+--- 127,161 ----
+  extern char *infont ;
+  static char *begbinary = "\n%%BeginBinary:" ;
++ extern int to_close;
++ 
++ /* Make a file stream seekable using temporary file if necessary */
++ /* -- Wonkoo Kim (wkim+@pitt.edu), December 20, 1997		 */
++ FILE *seekable (FILE *fp, char first)
++ {
++     FILE *ft;
++     long fpos, rcnt, wcnt;
++     char buffer[BUFSIZ];
++ 
++     if ((fpos = ftell(fp)) >= 0)
++ 	if (!fseek(fp, 0L, SEEK_END) && !fseek(fp, fpos, SEEK_SET))
++ 	    return (fp);
++ 
++     if ((ft = tmpfile()) == NULL) return (NULL);
++     fputc (first, ft);	    /* first char was read from fp before calling seekaable() */
++ 
++     while ((rcnt = fread (buffer, sizeof(char), BUFSIZ, fp)) > 0) {
++ 	wcnt = fwrite (buffer, sizeof(char), rcnt, ft);
++ 	if (wcnt != rcnt) return (NULL);
++     }
++     if (!feof(fp)) return (NULL);
++ 
++     /* close the input file, and rewind the temporary file pointer to the 2nd char */
++     (void) close_file (fp);
++     if (fseek(ft, 1L, SEEK_SET) != 0) return (NULL);
++ 
++     to_close = USE_FCLOSE;
++     return (ft);
++ }
++ 
+  void
+  copyfile(s)
+***************
+*** 123,127 ****
+     /* begin DOS EPS code */
+     int doseps = 0;
+!    unsigned long dosepsbegin, dosepsend = 0;
+     /* end DOS EPS code */
+  #ifdef VMCMS
+--- 168,173 ----
+     /* begin DOS EPS code */
+     int doseps = 0;
+!    int check_dosepsend = 0;	/* will be 1 if dosepsend is expected within 256 chars */
+!    unsigned long dosepsbegin = 0, dosepsend = 0;
+     /* end DOS EPS code */
+  #ifdef VMCMS
+***************
+*** 142,148 ****
+   *   or figure files to be installed in the .../ps directory.
+   */
+!       f = search(figpath, s, READ) ;
+        if (f == 0)
+!          f = search(headerpath, s, READ) ;
+  #ifdef VMCMS
+        lastdirsep = strrchr(s, '/') ;
+--- 188,206 ----
+   *   or figure files to be installed in the .../ps directory.
+   */
+! /*  open figure files in binary mode -- Wonkoo Kim (wkim+@pitt.edu), December 5, 1997 */
+! #ifdef EMTEXDIR
+! /*  using emtex_dir_search instead of search.	    sawade 26-sep-95 */
+!       f = emtex_dir_search(&ed_figpath, s, READBIN) ;
+! #else
+!       f = search(figpath, s, READBIN) ;
+! #endif
+        if (f == 0)
+! #ifdef EMTEXDIR
+! /*  using emtex_dir_search instead of search.	    sawade 26-sep-95 */
+! 	 f = emtex_dir_search(&ed_headerpath, s, READBIN) ;
+! #else
+! 	 f = search(headerpath, s, READBIN) ;
+! #endif
+! 
+  #ifdef VMCMS
+        lastdirsep = strrchr(s, '/') ;
+***************
+*** 162,166 ****
+--- 220,229 ----
+        break ;
+     default:
++ #ifdef EMTEXDIR
++ /*  using emtex_dir_search instead of search.	    sawade 26-sep-95 */
++       f = emtex_dir_search(&ed_headerpath, s, READ) ;
++ #else
+        f = search(headerpath, s, READ) ;
++ #endif
+        (void)sprintf(errbuf, "! Couldn't find header file %s", s) ;
+        break ;
+***************
+*** 178,183 ****
+        if (_osmode == OS2_MODE) {
+  #endif
+!       if (secure == 0)
+!          f = popen(s, "r") ;
+  #ifdef OS2
+        }
+--- 241,249 ----
+        if (_osmode == OS2_MODE) {
+  #endif
+! /*  open in binary mode -- Wonkoo Kim (wkim+@pitt.edu), December 5, 1997 */
+! 	if (secure == 0) {
+! 	    f = popen(s, READBIN) ;
+! 	    to_close = USE_PCLOSE;
+! 	}
+  #ifdef OS2
+        }
+***************
+*** 237,241 ****
+--- 303,312 ----
+  #if defined MSDOS || defined OS2 || defined(ATARIST)
+  	 (void)close_file(f) ;	/* close MSDOS font file */
++ #ifdef EMTEXDIR
++ /*  using emtex_dir_search instead of search.	    sawade 26-sep-95 */
++ 	 f = emtex_dir_search(&ed_headerpath, s, READBIN) ;  /* reopen in BINARY mode */
++ #else
+  	 f = search(headerpath, s, READBIN) ;  /* reopen in BINARY mode */
++ #endif
+  	 (void)sprintf(errbuf, "! Couldn't find header file %s", s) ;
+  	 if (f==NULL)
+***************
+*** 306,320 ****
+  /* begin DOS EPS code */
+           if (c == 'E'+0x80) {
+              if ((getc(f)=='P'+0x80) && (getc(f)=='S'+0x80)
+  	                            && (getc(f)=='F'+0x80)) {
+- #if defined MSDOS || defined OS2
+-                (void)close_file(f) ;  /* close DOS EPS file */
+-                f = search(headerpath, s, READBIN) ;
+-                                                    /* reopen in BINARY mode */
+-                (void)sprintf(errbuf, "! Couldn't find header file %s", s) ;
+-                if (f==NULL)
+-                  error(errbuf) ;
+-                fseek(f, 4L, 0);
+- #endif
+                 doseps = 1;
+                 dosepsbegin = getc(f) ;
+--- 377,385 ----
+  /* begin DOS EPS code */
+  	 if (c == 'E'+0x80) {
++ 	    f = seekable(f, c); /* make file seekable as popen() stream is not seekable */
++ 				/* -- Wonkoo Kim (wkim+@pitt.edu), December 20, 1997	*/
++ 	    if (f == NULL) error ("! error in making seekable");
+  	    if ((getc(f)=='P'+0x80) && (getc(f)=='S'+0x80)
+  				    && (getc(f)=='F'+0x80)) {
+  	       doseps = 1;
+  	       dosepsbegin = getc(f) ;
+***************
+*** 327,346 ****
+                 dosepsend += getc(f) * 256L * 65536 ;
+                 dosepsend += dosepsbegin;
+- #if defined MSDOS || defined OS2
+-                (void)close_file(f) ;  /* close DOS EPS file */
+-                f = search(headerpath, s, READ) ;  /* reopen in TEXT mode */
+-                (void)sprintf(errbuf, "! Couldn't find header file %s", s) ;
+-                if (f==NULL)
+-                  error(errbuf) ;
+- #endif
+                 fseek(f, dosepsbegin, 0);
+!                c = getc(f);
+!             }
+!             else {
+                 rewind(f);
+-                c = getc(f);
+              }
+           }
+  /* end DOS EPS code */
+           if (c != EOF) {
+              while (1) {
+--- 392,408 ----
+  	       dosepsend += getc(f) * 256L * 65536 ;
+  	       dosepsend += dosepsbegin;
+  	       fseek(f, dosepsbegin, 0);
+! 	       if ((dosepsend-dosepsbegin) < 256)	/* dosepsend is near */
+! 		    check_dosepsend = 1;
+! 	    } else {
+  	       rewind(f);
+  	    }
++ 	    c = getc(f);
+  	 }
+  /* end DOS EPS code */
++     /* CR-LF codes -- Wonkoo Kim (wkim+@pitt.edu), December 5, 1997	*/
++     /* When reading, CR chars are skipped in CR-LF pair (CR-LF ==> LF). */
++     /* DOS/OS2 further translates LF to CR-LF pair in text mode output. */
++     /* CR-LF codes (hopely) work for all unix, DOS/OS2, Mac OS, etc.	*/
+  	 if (c != EOF) {
+  	    while (1) {
+***************
+*** 372,398 ****
+                       }
+                       (void)putc(c, bitfile) ;
+!                      for (; size>0; size--) {
+                          c = getc(f) ;
+                          if (c == EOF)
+                             error("! premature end of file in binary section") ;
+                          (void)putc(c, bitfile) ;
+-                      }
+                       c = getc(f) ;
+                       while (c == '\n' || c == '\r') {
+                          (void)putc(c, bitfile) ;
+                          c = getc(f) ;
+                       }
+                       if (c != '%')
+                          error("! expected to see %%EndBinary at end of data") ;
+!                      while (1) {
+!                         (void)putc(c, bitfile) ;
+!                         if (c == '\r' || c == '\n')
+!                            break ;
+!                         c = getc(f) ;
+                          if (c == EOF)
+                             error("! premature end of file in binary section") ;
+                       }
+                       c = getc(f) ;
+                    }
+                 } else
+                    bbmatch = begbinary ;
+--- 434,496 ----
+  		     }
+  		     (void)putc(c, bitfile) ;
+! 		     if (c == '\r') {
+! 			c = getc(f);			/* skip CR if CR-LF pair */
+! 			if (c != '\n') {
+! #ifdef __THINK__
+! 			    (void) putc('\r', bitfile);
+! #else
+! 			    (void) putc('\n', bitfile);
+! #endif
+! 			}
+! 		     }
+! 		     if (c == '\n') {
+! 			(void) putc(c, bitfile);
+  			c = getc(f) ;
++ 		     }
++ #if defined(MSDOS)||defined(OS2)
++     /* set files in binary mode -- Wonkoo Kim (wkim+@pitt.edu), December 5, 1997 */
++ 		     fflush (bitfile);
++ 		     setmode (fileno(bitfile), O_BINARY);
++ #endif
++ 		     for (; size>0; size--) {
+  			if (c == EOF)
+  			   error("! premature end of file in binary section") ;
+  			(void)putc(c, bitfile) ;
+  		     c = getc(f) ;
++ 		     }
+  		     while (c == '\n' || c == '\r') {
+  			(void)putc(c, bitfile) ;
+  			c = getc(f) ;
+  		     }
++ #if defined(MSDOS)||defined(OS2)
++     /* set files back in text mode -- Wonkoo Kim (wkim+@pitt.edu), December 5, 1997 */
++ 		     fflush (bitfile);
++ 		     setmode (fileno(bitfile), O_TEXT);
++ #endif
+  		     if (c != '%')
+  			error("! expected to see %%EndBinary at end of data") ;
+! 		     while (c != '\r' && c != '\n') {
+  			if (c == EOF)
+  			   error("! premature end of file in binary section") ;
++ 			(void)putc(c, bitfile) ;
++ 			c = getc(f) ;
+  		     }
++ 		     if (c == '\r') {
++ 			c = getc(f);			/* skip CR if CR-LF pair */
++ 			if (c != '\n') {
++ #ifdef __THINK__
++ 			    (void) putc('\r', bitfile);
++ #else
++ 			    (void) putc('\n', bitfile);
++ #endif
++ 			}
++ 		     }
++ 		     if (c == '\n') {
++ 			(void) putc(c, bitfile);
+  		     c = getc(f) ;
+  		  }
++ 		     if (doseps && (dosepsend - ftell(f)) < 256)
++ 			check_dosepsend = 1;		/* dosepsend is near */
++ 		  }
+  	       } else
+  		  bbmatch = begbinary ;
+***************
+*** 404,411 ****
+                       while ((c=getc(f))!=EOF) {
+                          if (c == '\n' || c == '\r') {
+-                            c = '\n' ;
+                             break ;
+                          }
+                       }
+  		  } else {
+  		     (void)putc('%', bitfile) ;
+--- 502,515 ----
+  		     while ((c=getc(f))!=EOF) {
+  			if (c == '\n' || c == '\r') {
+  			   break ;
+  			}
+  		     }
++ 		     if (c == '\r') {
++ 			c = getc(f);			/* skip CR if CR-LF pair */
++ 			if (c != '\n') {
++ 			    (void) ungetc(c, f);
++ 			    c = '\n';                   /* to indicate line ending (prevc) */
++ 			}
++ 		     }					/* c == '\n' */
+  		  } else {
+  		     (void)putc('%', bitfile) ;
+***************
+*** 413,437 ****
+                          (void)putc(c, bitfile) ;
+  		  }
+  #ifdef VMCMS
+!                } else if (c != 0x37 ) {
+  #else
+  #ifdef MVSXA
+!                } else if (c != 0x37 ) {
+  #else
+!                } else if (c != 4) {
+  #endif
+  #endif
+                    (void)putc(c, bitfile) ;
+                 }
+                 prevc = c ;
+  /* begin DOS EPS code */
+!                if (doseps && (ftell(f)>=dosepsend))
+                    break;      /* stop at end of DOS EPS PostScript section */
+  /* end DOS EPS code */
+                 c = getc(f) ;
+                 if (c == EOF)
+                    break ;
+!                else if (c == '\r')
+!                   c = '\n' ;
+              }
+           }
+--- 517,575 ----
+  			(void)putc(c, bitfile) ;
+  		  }
++ 	       }
+  #ifdef VMCMS
+! 	       else if (c != 0x37 )
+  #else
+  #ifdef MVSXA
+! 	       else if (c != 0x37 )
+  #else
+! #if defined(OS2) || defined(MSDOS)	     /* Wonkoo Kim (wkim+@pitt.edu), July 6, 1997 */
+! 	       else if (c != 4 && c != 0x1a) /* remove Ctrl-Z from "`gunzip -c x.eps.gz"  */
+! #else
+! 	       else if (c != 4)
+! #endif
+  #endif
+  #endif
++ 		{
++ 		    if (c == '\r') {
++ 			c = getc(f);			/* skip CR if CR-LF pair */
++ 			if (c != '\n') {
++ 			    (void) ungetc(c, f);
++ #ifdef __THINK__
++ 			    c = '\r';
++ #else
++ 			    c = '\n';
++ #endif
++ 			}
++ 		    }
+  		  (void)putc(c, bitfile) ;
++ #ifdef __THINK__
++ 		    if (c == '\r') c = '\n';            /* to set prevc for Mac OS */
++ #endif
+  	       }
+  	       prevc = c ;
+  /* begin DOS EPS code */
+! 		/* rarely call ftell() to speed up dramatically (>10x) for big files*/
+! 		/* (It took 7.5 mins before, but now only 35 secs for 11MB on P90.) */
+! 		/* -- Wonkoo Kim (wkim+@pitt.edu), December 17, 1997		    */
+! 		if (check_dosepsend) {
+! 		    if (ftell(f) >= dosepsend)
+  		  break;      /* stop at end of DOS EPS PostScript section */
++ 		} else if (doseps && (c == '\n' || c == '\r')) {
++ 		    if ((dosepsend - ftell(f)) < 256) { /* dosepsend is near */
++ 			check_dosepsend = 1;
++ 		    }
++ 		}
+  /* end DOS EPS code */
+  	       c = getc(f) ;
+  	       if (c == EOF)
+  		  break ;
+! 		else if (c == '\r') {
+! 		    c = getc(f);			/* skip CR if CR-LF pair */
+! 		    if (c != '\n') {
+! 			(void) ungetc(c, f);
+! 			c = '\n';                       /* CR-only -> LF */
+! 		    }
+! 		}					/* c == '\n' */
+  	    }
+  	 }
+***************
+*** 440,466 ****
+           (void)putc('\n', bitfile) ;
+        linepos = 0 ;
+! #ifndef VMCMS
+! #ifndef MVSXA
+! #ifndef VMS
+! #ifndef MSDOS
+! #ifndef ATARIST
+! #ifndef __THINK__
+!       if (infigure == 2)
+! #ifdef OS2
+!          {
+!             if (_osmode == OS2_MODE)
+!                (void)pclose(f) ;
+!          }
+! #else
+!          (void)pclose(f) ;
+! #endif
+!       else
+! #endif
+! #endif
+! #endif
+! #endif
+! #endif
+! #endif
+!          (void)fclose(f) ;
+        if (!disablecomments)
+           if (infigure)
+--- 578,584 ----
+  	 (void)putc('\n', bitfile) ;
+        linepos = 0 ;
+! 
+!       (void) close_file (f);
+! 
+        if (!disablecomments)
+  	 if (infigure)

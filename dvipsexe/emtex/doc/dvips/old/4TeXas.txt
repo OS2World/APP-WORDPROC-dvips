@@ -1,0 +1,90 @@
+=====================================================================
+Installation of dvips version 5.58 on a PC                      28 October 95
+------------------------------------------
+
+This document covers the successful installation of dvips version 5.58 on a 
+386/40 PC running MS-DOS 6.20 and Windows 3.1.  While most installations of 
+dvips on a PC assume the use of emTeX, this document covers its use with TeXas 
+1.0, which has been running very reliably on my 386/40 for a couple of years.
+
+The installation of 5.58 was motivated by a problem that cropped up in the use 
+of version 5.47.  This older version had been installed around the same 
+time as TeXas and had been running successfully for a couple of years.  
+The PostScript files created by dvips 5.47 used PK fonts at 300 dpi 
+resolution that applied for an HP LaserJet IIP.  This printer had been 
+equipped with a Pacific Page XL Postscript accelerator board and 
+cartridge several years ago and has been also working very reliably.  
+However, the more recent 600 dpi printers, like the HP LaserJet 4, allow 
+gray scale images to be rendered much more accurately, so a .dvi file 
+that was created by LaTex 2.09 was processed by dvips 5.47 at the higher 
+600 dpi resolution (the appropriate PK fonts having been obtained from 
+the CTAN archive at ftp.shsu.edu).  Unfortunately, this version of dvips 
+generates an error ("out of memory while allocating raster") when using 
+the higher resolution fonts.  I sent an e-mail to Russell Lang who 
+responded with the suggestion that dvips 5.58 would solve this problem.
+
+The four files for the PC dvips version 5.58 distribution were downloaded via 
+ftp from ftp.shsu.edu/tex-archive/systems/msdos/dviware/dvips/dvips558.pc.  
+The names of these files are: dvipsexe.zip, dvipsfnt.zip, dvipssrc.zip, and 
+readme.1st.  The old version's directory was renamed from c:\app\dvips to 
+c:\app\dvips547 and a new c:\app\dvips directory was created.  There is 
+nothing special about the directory names or structure.  The app 
+directory is simply how files are organized on my particular system.  On 
+many systems, c:\dvips would probably be used.  Again, a name other than 
+dvips can be used if there is some important reason to.
+
+Two of the three compressed files were moved to subdirectories: dvipsfnt.zip 
+to c:\app\dvips\fonts, and dvipssrc.zip to c:\app\dvips\sources.  The 
+dvipsfnt.zip file was decompressed with pkunzip.  The resulting .tfm files 
+were moved to c:\app\dvips\fonts\tfm, while the .vf files were placed in 
+c:\app\dvips\fonts\vf.  The dvipsfnt.zip file was then deleted.  The 
+dvipssrc.zip file had to be decompressed with the -d option because there are 
+patched versions of some of the .c program files.  If the -d option is not 
+used, pkunzip will ask if the original .c files are to be overwritten.  Both 
+versions should be kept around if you want to build the program from scratch 
+at some point.  The -d option causes a complicated directory tree to be 
+created under c:\app\dvips\sources.  I moved things around so that there is 
+only one subdirectory under c:\app\dvips\sources--the patch subdirectory.  I 
+put the patch-related files there.  The rest of the source-related  files are 
+in the sources directory.  Note that the distribution included binaries that 
+run in a DOS window under Windows, so the sources aren't really needed unless 
+a rebuild, using say the Borland Turbo C compiler, is planned.  There are some 
+other files that come with dvipssrc.zip, so I did not bother trying to figure 
+out what source files I really needed and which I could delete--I just kept 
+them all (except emx.zip--see below).  
+
+The 5.58 version of dvips uses the GNU DOS extender, emx or rsx.  After 
+reading the README file, it seemed that rsx was the best choice for Windows.  
+The rsx.zip file comes in the dvipssrc.zip file, as does emx.zip.  Since I 
+would not be using emx, I did delete the emx.zip file.  I then moved rsx.zip 
+to c:\app\rsx and decompressed it with pkunzip.  The instructions there say to 
+set an environment variable called RSX to the rsx directory, so I put the 
+command "set RSX=c:\app\rsx\rsx.exe" in my autoexec.bat file (I later rebooted 
+before running the new dvips program).
+
+The binaries were then unpacked using pkunzip on dvipsexe.zip in 
+c:\app\dvips and the .zip file then deleted.  Just to be safe, I ran the 
+McAfee virus scanner on all the dvips files--no viruses were found. At this 
+point, I took the machine down and rebooted so the RSX variable would be 
+set.  The TeX-related variables should look something like the following:
+
+TEMP=c:\
+TEXPOOL=c:\app\tex\formats
+TEXFORMATS=c:\app\tex\formats;c:\app\latex\formats
+TEXFONTS=c:\app\tex\fonts\tfm;c:\app\latex\fonts\tfm
+TEXPKS=c:\app\tex\fonts\pk\%d\%f.%p;c:\app\latex\fonts\pk\%d\%f.%p;c:\app\dvips\
+fonts\pk\%d\%f.%p
+TEXINPUTS=c:\app\tex\inputs;c:\app\latex\inputs;c:\app\dvips\inputs;
+TEXCONFIG=c:\app\dvips
+
+The PATH variable should also have c:\app\dvips on it.  With this setup, the 
+command "dvips32 -M -D 600 -o file.ps file.dvi" creates the file.ps PostScript 
+file from the file.dvi file using the 600 dpi fonts, with no error messages 
+about there not being enough memory.  The "copy file.ps lpt1:" command sends 
+file.ps to the PostScript printer (HP LaserJet 4) on lpt1:.  The resulting 
+printout looks great (noticeably better than at 300 dpi)!  
+
+Joe DeWitte (dewitte@seas.gwu.edu)
+=====================================================================
+
+

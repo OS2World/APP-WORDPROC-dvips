@@ -1,0 +1,31 @@
+*** header.c.orig	Tue Nov  3 12:58:38 1998
+--- header.c	Thu Nov 19 04:30:34 1998
+***************
+*** 17,20 ****
+--- 17,28 ----
+   *   The external routines we use.
+   */
++ 
++ #ifdef EMTEXDIR
++ /*	sawade@physik.tu-berlin.de	26-sep-95	*/
++ #include "emtexdir.h"
++ extern struct emtex_dir ed_headerpath ;
++ extern FILE * emtex_dir_search() ;
++ #endif
++ 
+  extern char *newstring() ;
+  extern void error() ;
+***************
+*** 68,72 ****
+--- 76,86 ----
+  char *s ;
+  {
++ 
++ #ifdef EMTEXDIR
++ /*  using emtex_dir_search instead of search.	    sawade 26-sep-95 */
++    FILE *f = emtex_dir_search(&ed_headerpath, s, READ) ;
++ #else
+     FILE *f = search(headerpath, s, READ) ;
++ #endif
+  
+     if (f==0) {

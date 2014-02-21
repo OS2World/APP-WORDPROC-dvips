@@ -1,0 +1,36 @@
+*** loadfont.c.orig	Tue Nov  3 12:58:38 1998
+--- loadfont.c	Thu Nov 19 04:30:34 1998
+***************
+*** 170,176 ****
+--- 170,178 ----
+  #ifndef MSDOS
+  #ifdef OS2
++ #if 0	    /* To append mfjob file, removed by Wonkoo Kim (wkim+@pitt.edu), July 2, 1997 */
+     if (_osmode == OS2_MODE)
+        dontmakefont = 1;       /* failed so don't try again under OS/2,
+  				 but do try for MSDOS */
++ #endif		/* wkim */
+  #else
+  #ifndef ATARIST
+***************
+*** 257,263 ****
+     (void)sprintf(name, "%s.%dpk", n, fd->dpi) ;
+  #endif
+     (void)sprintf(errbuf,
+!       "Font %s%s not found, characters will be left blank.",
+!       fd->area, name) ;
+     error(errbuf) ;
+     return(0) ;
+--- 259,270 ----
+     (void)sprintf(name, "%s.%dpk", n, fd->dpi) ;
+  #endif
++ 
++ /*	Output modification by SAW 27/6/95 */
+     (void)sprintf(errbuf,
+! #if defined OS2 || defined MSDOS
+!       "Font %s at %d dpi not found, characters will be left blank.", n, fd->dpi) ;
+! #else
+!       "Font %s%s not found, characters will be left blank.", fd->area, name) ;
+! #endif
+     error(errbuf) ;
+     return(0) ;

@@ -1,0 +1,182 @@
+%%%------- psnfss.map (Note: I've not checked about differences between
+%%%                     beta distribution (where this file stems from) and
+%%%                     current version !!!)
+%%%                     sawade@physik.tu-berlin.de
+%%%%%  agaramon 
+padb8r AGaramond-Bold "TeXBase1Encoding ReEncodeFont" <8r.enc <padb8a.pfb
+padbi8r AGaramond-BoldItalic "TeXBase1Encoding ReEncodeFont" <8r.enc <padbi8a.pfb
+padr8r AGaramond-Regular "TeXBase1Encoding ReEncodeFont" <8r.enc <padr8a.pfb
+padri8r AGaramond-Italic "TeXBase1Encoding ReEncodeFont" <8r.enc <padri8a.pfb
+pads8r AGaramond-Semibold "TeXBase1Encoding ReEncodeFont" <8r.enc <pads8a.pfb
+padsi8r AGaramond-SemiboldItalic "TeXBase1Encoding ReEncodeFont" <8r.enc <padsi8a.pfb
+padbo8r AGaramond-Bold " .167 SlantFont TeXBase1Encoding ReEncodeFont " <8r.enc <padb8a.pfb
+padro8r AGaramond-Regular " .167 SlantFont TeXBase1Encoding ReEncodeFont " <8r.enc <padr8a.pfb
+padso8r AGaramond-Semibold " .167 SlantFont TeXBase1Encoding ReEncodeFont " <8r.enc <pads8a.pfb
+%%%%%
+%%%%%  avantgar 
+%%%%%
+pagd8r AvantGarde-Demi "TeXBase1Encoding ReEncodeFont" <8r.enc
+pagdo8r AvantGarde-DemiOblique "TeXBase1Encoding ReEncodeFont" <8r.enc
+pagk8r AvantGarde-Book "TeXBase1Encoding ReEncodeFont" <8r.enc
+pagko8r AvantGarde-BookOblique "TeXBase1Encoding ReEncodeFont" <8r.enc
+%%%%%
+%%%%%  baskervi 
+%%%%%
+pnbb8r NewBaskerville-Bold "TeXBase1Encoding ReEncodeFont" <8r.enc <pnbb8a.pfb
+pnbbi8r NewBaskerville-BoldItalic "TeXBase1Encoding ReEncodeFont" <8r.enc <pnbbi8a.pfb
+pnbr8r NewBaskerville-Roman "TeXBase1Encoding ReEncodeFont" <8r.enc <pnbr8a.pfb
+pnbri8r NewBaskerville-Italic "TeXBase1Encoding ReEncodeFont" <8r.enc <pnbri8a.pfb
+pnbbo8r NewBaskerville-Bold " .167 SlantFont TeXBase1Encoding ReEncodeFont " <8r.enc <pnbb8a.pfb
+pnbro8r NewBaskerville-Roman " .167 SlantFont TeXBase1Encoding ReEncodeFont " <8r.enc <pnbr8a.pfb
+%%%%%
+%%%%%  bembo 
+%%%%%
+pbbb8r MBembo-Bold "TeXBase1Encoding ReEncodeFont" <8r.enc <pbbb8a.pfb
+pbbbi8r MBembo-BoldItalic "TeXBase1Encoding ReEncodeFont" <8r.enc <pbbbi8a.pfb
+pbbr8r MBembo "TeXBase1Encoding ReEncodeFont" <8r.enc <pbbr8a.pfb
+pbbri8r MBembo-Italic "TeXBase1Encoding ReEncodeFont" <8r.enc <pbbri8a.pfb
+pbbbo8r MBembo-Bold " .167 SlantFont TeXBase1Encoding ReEncodeFont " <8r.enc <pbbb8a.pfb
+pbbro8r MBembo " .167 SlantFont TeXBase1Encoding ReEncodeFont " <8r.enc <pbbr8a.pfb
+%%%%%
+%%%%%  bookman 
+%%%%%
+pbkd8r Bookman-Demi "TeXBase1Encoding ReEncodeFont" <8r.enc
+pbkdi8r Bookman-DemiItalic "TeXBase1Encoding ReEncodeFont" <8r.enc
+pbkdo8r Bookman-Demi " .167 SlantFont TeXBase1Encoding ReEncodeFont " <8r.enc
+pbkl8r Bookman-Light "TeXBase1Encoding ReEncodeFont" <8r.enc
+pbkli8r Bookman-LightItalic "TeXBase1Encoding ReEncodeFont" <8r.enc
+pbklo8r Bookman-Light " .167 SlantFont TeXBase1Encoding ReEncodeFont " <8r.enc
+%%%%%
+%%%%%  courier 
+%%%%%
+pcrb8r Courier-Bold "TeXBase1Encoding ReEncodeFont" <8r.enc
+pcrbo8r Courier-BoldOblique "TeXBase1Encoding ReEncodeFont" <8r.enc
+pcrr8r Courier "TeXBase1Encoding ReEncodeFont" <8r.enc
+pcrro8r Courier-Oblique "TeXBase1Encoding ReEncodeFont" <8r.enc
+%%%%%
+%%%%%  garamond 
+%%%%%
+pgmb8r Garamond-Bold "TeXBase1Encoding ReEncodeFont" <8r.enc <pgmb8a.pfb
+pgmbi8r Garamond-BoldItalic "TeXBase1Encoding ReEncodeFont" <8r.enc <pgmbi8a.pfb
+pgml8r Garamond-Light "TeXBase1Encoding ReEncodeFont" <8r.enc <pgml8a.pfb
+pgmli8r Garamond-LightItalic "TeXBase1Encoding ReEncodeFont" <8r.enc <pgmli8a.pfb
+pgmbo8r Garamond-Bold " .167 SlantFont TeXBase1Encoding ReEncodeFont " <8r.enc <pgmb8a.pfb
+pgmlo8r Garamond-Light " .167 SlantFont TeXBase1Encoding ReEncodeFont " <8r.enc <pgml8a.pfb
+%%%%%
+%%%%%  gillsans 
+%%%%%
+pgsb8r GillSans-Bold "TeXBase1Encoding ReEncodeFont" <8r.enc <pgsb8a.pfb
+pgsb8rc GillSans-BoldCondensed "TeXBase1Encoding ReEncodeFont" <8r.enc <pgsb8ac.pfb
+pgsbi8r GillSans-BoldItalic "TeXBase1Encoding ReEncodeFont" <8r.enc <pgsbi8a.pfb
+pgsl8r GillSans-Light "TeXBase1Encoding ReEncodeFont" <8r.enc <pgsl8a.pfb
+pgsli8r GillSans-LightItalic "TeXBase1Encoding ReEncodeFont" <8r.enc <pgsli8a.pfb
+pgsr8r GillSans "TeXBase1Encoding ReEncodeFont" <8r.enc <pgsr8a.pfb
+pgsr8rc GillSans-Condensed "TeXBase1Encoding ReEncodeFont" <8r.enc <pgsr8ac.pfb
+pgsri8r GillSans-Italic "TeXBase1Encoding ReEncodeFont" <8r.enc <pgsri8a.pfb
+pgsu8r GillSans-UltraBold "TeXBase1Encoding ReEncodeFont" <8r.enc <pgsu8a.pfb
+pgsu8rc GillSans-UltraBoldCondensed "TeXBase1Encoding ReEncodeFont" <8r.enc <pgsu8ac.pfb
+pgsx8r GillSans-ExtraBold "TeXBase1Encoding ReEncodeFont" <8r.enc <pgsx8a.pfb
+pgsbo8r GillSans-Bold " .167 SlantFont TeXBase1Encoding ReEncodeFont " <8r.enc <pgsb8a.pfb
+pgsbo8rc GillSans-BoldCondensed " .167 SlantFont TeXBase1Encoding ReEncodeFont " <8r.enc <pgsb8ac.pfb
+pgslo8r GillSans-Light " .167 SlantFont TeXBase1Encoding ReEncodeFont " <8r.enc <pgsl8a.pfb
+pgsro8r GillSans " .167 SlantFont TeXBase1Encoding ReEncodeFont " <8r.enc <pgsr8a.pfb
+pgsro8rc GillSans-Condensed " .167 SlantFont TeXBase1Encoding ReEncodeFont " <8r.enc <pgsr8ac.pfb
+pgsuo8r GillSans-UltraBold " .167 SlantFont TeXBase1Encoding ReEncodeFont " <8r.enc <pgsu8a.pfb
+pgsuo8rc GillSans-UltraBoldCondensed " .167 SlantFont TeXBase1Encoding ReEncodeFont " <8r.enc <pgsu8ac.pfb
+pgsxo8r GillSans-ExtraBold " .167 SlantFont TeXBase1Encoding ReEncodeFont " <8r.enc <pgsx8a.pfb
+%%%%%
+%%%%%  helvetic 
+%%%%%
+phvb8r Helvetica-Bold "TeXBase1Encoding ReEncodeFont" <8r.enc
+phvb8rn Helvetica-Narrow-Bold "TeXBase1Encoding ReEncodeFont" <8r.enc
+phvbo8r Helvetica-BoldOblique "TeXBase1Encoding ReEncodeFont" <8r.enc
+phvbo8rn Helvetica-Narrow-BoldOblique "TeXBase1Encoding ReEncodeFont" <8r.enc
+phvbon8r Helvetica-BoldOblique " .82 ExtendFont TeXBase1Encoding ReEncodeFont " <8r.enc
+phvbrn8r Helvetica-Bold " .82 ExtendFont TeXBase1Encoding ReEncodeFont " <8r.enc
+phvl8r Helvetica-Light "TeXBase1Encoding ReEncodeFont" <8r.enc
+phvl8rc Helvetica-Condensed-Light "TeXBase1Encoding ReEncodeFont" <8r.enc
+phvlo8r Helvetica-LightOblique "TeXBase1Encoding ReEncodeFont" <8r.enc
+phvlo8rc Helvetica-Condensed-LightObl "TeXBase1Encoding ReEncodeFont" <8r.enc
+phvr8r Helvetica "TeXBase1Encoding ReEncodeFont" <8r.enc
+phvr8rn Helvetica-Narrow "TeXBase1Encoding ReEncodeFont" <8r.enc
+phvro8r Helvetica-Oblique "TeXBase1Encoding ReEncodeFont" <8r.enc
+phvro8rn Helvetica-Narrow-Oblique "TeXBase1Encoding ReEncodeFont" <8r.enc
+phvron8r Helvetica-Oblique " .82 ExtendFont TeXBase1Encoding ReEncodeFont " <8r.enc
+phvrrn8r Helvetica " .82 ExtendFont TeXBase1Encoding ReEncodeFont " <8r.enc
+%%%%%
+%%%%%  ncntrsbk 
+%%%%%
+pncb8r NewCenturySchlbk-Bold "TeXBase1Encoding ReEncodeFont" <8r.enc
+pncbi8r NewCenturySchlbk-BoldItalic "TeXBase1Encoding ReEncodeFont" <8r.enc
+pncbo8r NewCenturySchlbk-Bold " .167 SlantFont TeXBase1Encoding ReEncodeFont " <8r.enc
+pncr8r NewCenturySchlbk-Roman "TeXBase1Encoding ReEncodeFont" <8r.enc
+pncri8r NewCenturySchlbk-Italic "TeXBase1Encoding ReEncodeFont" <8r.enc
+pncro8r NewCenturySchlbk-Roman " .167 SlantFont TeXBase1Encoding ReEncodeFont " <8r.enc
+%%%%%
+%%%%%  optima 
+%%%%%
+popb8r Optima-Bold "TeXBase1Encoding ReEncodeFont" <8r.enc <popb8a.pfb
+popbo8r Optima-BoldOblique "TeXBase1Encoding ReEncodeFont" <8r.enc <popbo8a.pfb
+popr8r Optima "TeXBase1Encoding ReEncodeFont" <8r.enc <popr8a.pfb
+popro8r Optima-Oblique "TeXBase1Encoding ReEncodeFont" <8r.enc <popro8a.pfb
+%%%%%
+%%%%%  palatino 
+%%%%%
+pplb8r Palatino-Bold "TeXBase1Encoding ReEncodeFont" <8r.enc
+pplbi8r Palatino-BoldItalic "TeXBase1Encoding ReEncodeFont" <8r.enc
+pplbo8r Palatino-Bold " .167 SlantFont TeXBase1Encoding ReEncodeFont " <8r.enc
+pplbu8r Palatino-BoldItalic " -.1763 SlantFont TeXBase1Encoding ReEncodeFont " <8r.enc
+pplr8r Palatino-Roman "TeXBase1Encoding ReEncodeFont" <8r.enc
+pplri8r Palatino-Italic "TeXBase1Encoding ReEncodeFont" <8r.enc
+pplro8r Palatino-Roman " .167 SlantFont TeXBase1Encoding ReEncodeFont " <8r.enc
+pplrre8r Palatino-Roman " 1.2 ExtendFont TeXBase1Encoding ReEncodeFont " <8r.enc
+pplrrn8r Palatino-Roman " .82 ExtendFont TeXBase1Encoding ReEncodeFont " <8r.enc
+pplru8r Palatino-Italic " -.1763 SlantFont TeXBase1Encoding ReEncodeFont " <8r.enc
+%%%%%
+%%%%%  symbol 
+%%%%%
+psyr Symbol
+%%%%%
+%%%%%  times 
+%%%%%
+ptmb8r Times-Bold "TeXBase1Encoding ReEncodeFont" <8r.enc
+ptmbi8r Times-BoldItalic "TeXBase1Encoding ReEncodeFont" <8r.enc
+ptmbo8r Times-Bold " .167 SlantFont TeXBase1Encoding ReEncodeFont " <8r.enc
+ptmr8r Times-Roman "TeXBase1Encoding ReEncodeFont" <8r.enc
+ptmri8r Times-Italic "TeXBase1Encoding ReEncodeFont" <8r.enc
+ptmro8r Times-Roman " .167 SlantFont TeXBase1Encoding ReEncodeFont " <8r.enc
+ptmrre8r Times-Roman " 1.2 ExtendFont TeXBase1Encoding ReEncodeFont " <8r.enc
+ptmrrn8r Times-Roman " .82 ExtendFont TeXBase1Encoding ReEncodeFont " <8r.enc
+psyro Symbol " .167 SlantFont "
+%%%%%
+%%%%%  univers 
+%%%%%
+punb8r Univers-Bold "TeXBase1Encoding ReEncodeFont" <8r.enc <punb8a.pfb
+punbo8r Univers-BoldOblique "TeXBase1Encoding ReEncodeFont" <8r.enc <punbo8a.pfb
+punbo8rc Univers-CondensedBoldOblique "TeXBase1Encoding ReEncodeFont" <8r.enc <punbo8ac.pfb
+punl8r Univers-Light "TeXBase1Encoding ReEncodeFont" <8r.enc <punl8a.pfb
+punlo8r Univers-LightOblique "TeXBase1Encoding ReEncodeFont" <8r.enc <punlo8a.pfb
+punlo8rc Univers-CondensedLightOblique "TeXBase1Encoding ReEncodeFont" <8r.enc <punlo8ac.pfb
+punr8r Univers "TeXBase1Encoding ReEncodeFont" <8r.enc <punr8a.pfb
+punr8rc Univers-Condensed "TeXBase1Encoding ReEncodeFont" <8r.enc <punr8ac.pfb
+punro8r Univers-Oblique "TeXBase1Encoding ReEncodeFont" <8r.enc <punro8a.pfb
+punro8rc Univers-CondensedOblique "TeXBase1Encoding ReEncodeFont" <8r.enc <punro8ac.pfb
+%%%%%
+%%%%%  utopia 
+%%%%%
+putb8r Utopia-Bold "TeXBase1Encoding ReEncodeFont" <8r.enc <putb8a.pfb
+putbi8r Utopia-BoldItalic "TeXBase1Encoding ReEncodeFont" <8r.enc <putbi8a.pfb
+putbo8r Utopia-Bold " .167 SlantFont TeXBase1Encoding ReEncodeFont " <8r.enc <putb8a.pfb
+putr8r Utopia-Regular "TeXBase1Encoding ReEncodeFont" <8r.enc <putr8a.pfb
+putri8r Utopia-Italic "TeXBase1Encoding ReEncodeFont" <8r.enc <putri8a.pfb
+putro8r Utopia-Regular " .167 SlantFont TeXBase1Encoding ReEncodeFont " <8r.enc <putr8a.pfb
+%%%%%
+%%%%%  zapfchan 
+%%%%%
+pzcmi8r ZapfChancery-MediumItalic "TeXBase1Encoding ReEncodeFont" <8r.enc
+%%%%%
+%%%%%  zapfding 
+%%%%%
+pzdr ZapfDingbats
+
+
